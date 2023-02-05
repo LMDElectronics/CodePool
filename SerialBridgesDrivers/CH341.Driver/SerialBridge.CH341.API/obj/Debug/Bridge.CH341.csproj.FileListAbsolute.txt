@@ -1,6 +1,0 @@
-C:\Users\MAX PC\Documents\projects\Serial_To_SPI_Bridge_APP\project_c#_example\ch341-Sharp-master\ch341-Sharp-master\ch341\bin\Debug\Sharp341.dll
-C:\Users\MAX PC\Documents\projects\Serial_To_SPI_Bridge_APP\project_c#_example\ch341-Sharp-master\ch341-Sharp-master\ch341\bin\Debug\Sharp341.pdb
-C:\Users\MAX PC\Documents\projects\Serial_To_SPI_Bridge_APP\project_c#_example\ch341-Sharp-master\ch341-Sharp-master\ch341\obj\Debug\Bridge.CH341.csprojAssemblyReference.cache
-C:\Users\MAX PC\Documents\projects\Serial_To_SPI_Bridge_APP\project_c#_example\ch341-Sharp-master\ch341-Sharp-master\ch341\obj\Debug\Bridge.CH341.csproj.CoreCompileInputs.cache
-C:\Users\MAX PC\Documents\projects\Serial_To_SPI_Bridge_APP\project_c#_example\ch341-Sharp-master\ch341-Sharp-master\ch341\obj\Debug\Sharp341.dll
-C:\Users\MAX PC\Documents\projects\Serial_To_SPI_Bridge_APP\project_c#_example\ch341-Sharp-master\ch341-Sharp-master\ch341\obj\Debug\Sharp341.pdb
