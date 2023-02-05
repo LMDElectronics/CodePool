@@ -1,6 +1,4 @@
-*.pdb
 *.obj
-*.dll
 *.pdb
 *.exe
 obj/
