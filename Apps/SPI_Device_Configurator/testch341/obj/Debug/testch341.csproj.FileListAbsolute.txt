@@ -1,9 +1,0 @@
-C:\Users\MAX PC\source\repos\SPI_Device_Configurator\testch341\bin\Debug\testch341.exe.config
-C:\Users\MAX PC\source\repos\SPI_Device_Configurator\testch341\bin\Debug\testch341.exe
-C:\Users\MAX PC\source\repos\SPI_Device_Configurator\testch341\bin\Debug\testch341.pdb
-C:\Users\MAX PC\source\repos\SPI_Device_Configurator\testch341\obj\Debug\testch341.Properties.Resources.resources
-C:\Users\MAX PC\source\repos\SPI_Device_Configurator\testch341\obj\Debug\testch341.csproj.GenerateResource.cache
-C:\Users\MAX PC\source\repos\SPI_Device_Configurator\testch341\obj\Debug\testch341.csproj.CoreCompileInputs.cache
-C:\Users\MAX PC\source\repos\SPI_Device_Configurator\testch341\obj\Debug\testch341.exe
-C:\Users\MAX PC\source\repos\SPI_Device_Configurator\testch341\obj\Debug\testch341.pdb
-C:\Users\MAX PC\source\repos\SPI_Device_Configurator\testch341\obj\Debug\testch341.Form1.resources
