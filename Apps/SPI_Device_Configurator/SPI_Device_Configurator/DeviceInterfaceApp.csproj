@@ -119,13 +119,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\code_pool\SerialBridgesDrivers\BridgeLoadLibrary\BridgeLoadLibrary\BridgeLoadLibrary.csproj">
+    <Folder Include="BridgeDataParser\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\SerialBridgesDrivers\BridgeLoadLibrary\BridgeLoadLibrary\BridgeLoadLibrary.csproj">
       <Project>{0ac113ff-924d-4c2b-83cd-7c9cde688bcc}</Project>
       <Name>BridgeLoadLibrary</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="BridgeDataParser\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

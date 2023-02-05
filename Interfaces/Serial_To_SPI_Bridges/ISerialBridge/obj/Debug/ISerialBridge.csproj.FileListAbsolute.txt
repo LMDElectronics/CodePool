@@ -3,3 +3,8 @@ C:\Users\MAX PC\source\repos\code_pool\Interfaces\Serial_To_SPI_Bridges\ISerialB
 C:\Users\MAX PC\source\repos\code_pool\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\obj\Debug\ISerialBridge.csproj.CoreCompileInputs.cache
 C:\Users\MAX PC\source\repos\code_pool\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\obj\Debug\ISerialBridge.dll
 C:\Users\MAX PC\source\repos\code_pool\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\obj\Debug\ISerialBridge.pdb
+C:\Users\MAX PC\Documents\repositories\CodePool\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\bin\Debug\ISerialBridge.dll
+C:\Users\MAX PC\Documents\repositories\CodePool\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\bin\Debug\ISerialBridge.pdb
+C:\Users\MAX PC\Documents\repositories\CodePool\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\obj\Debug\ISerialBridge.csproj.CoreCompileInputs.cache
+C:\Users\MAX PC\Documents\repositories\CodePool\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\obj\Debug\ISerialBridge.dll
+C:\Users\MAX PC\Documents\repositories\CodePool\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\obj\Debug\ISerialBridge.pdb

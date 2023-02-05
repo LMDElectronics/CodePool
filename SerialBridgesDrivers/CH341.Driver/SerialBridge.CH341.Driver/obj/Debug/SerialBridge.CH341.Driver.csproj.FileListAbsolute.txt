@@ -9,3 +9,14 @@ C:\Users\MAX PC\source\repos\code_pool\SerialBridgesDrivers\CH341.Driver\SerialB
 C:\Users\MAX PC\source\repos\code_pool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\obj\Debug\SerialBridge.CH341.Driver.csproj.CopyComplete
 C:\Users\MAX PC\source\repos\code_pool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\obj\Debug\SerialBridge.CH341.Driver.dll
 C:\Users\MAX PC\source\repos\code_pool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\obj\Debug\SerialBridge.CH341.Driver.pdb
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\bin\Debug\SerialBridge.CH341.Driver.dll
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\bin\Debug\SerialBridge.CH341.Driver.pdb
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\bin\Debug\ISerialBridge.dll
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\bin\Debug\SerialBridge.CH341.API.dll
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\bin\Debug\ISerialBridge.pdb
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\bin\Debug\SerialBridge.CH341.API.pdb
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\obj\Debug\SerialBridge.CH341.Driver.csprojAssemblyReference.cache
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\obj\Debug\SerialBridge.CH341.Driver.csproj.CoreCompileInputs.cache
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\obj\Debug\SerialBridge.CH341.Driver.csproj.CopyComplete
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\obj\Debug\SerialBridge.CH341.Driver.dll
+C:\Users\MAX PC\Documents\repositories\CodePool\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\obj\Debug\SerialBridge.CH341.Driver.pdb
