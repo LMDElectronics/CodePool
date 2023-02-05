@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<GroupControlsCatalog> 
+  <ControlsCataLog>   
+    <ButtonCatalog>                
+      <Button>   
+        <Name>button_Send_Bridge_Config</Name>
+        <Text>Send Bridge Config</Text>
+        <XPosition>342</XPosition>
+        <YPosition>120</YPosition>        
+        <Height>40</Height>
+        <Width>100</Width>      
+        <TextAlign>MiddleCenter</TextAlign>
+      </Button>          
+    </ButtonCatalog>        
+    <CheckBoxCatalog>  
+      <CheckBox>
+        <Name>CheckBox_SetStream_B7</Name>
+        <Text>[Bit 7] 1:SPI byte MSB first, 0:SPI byte LSB first</Text>
+        <XPosition>10</XPosition>
+        <YPosition>20</YPosition>   
+        <AutoSize>true</AutoSize>
+        <Checked>true</Checked>
+      </CheckBox>    
+      <CheckBox>
+        <Name>CheckBox_SetStream_B2</Name>
+        <Text>[Bit 2] 1:Double SPI I/O, 0:Single SPI I/O</Text>
+        <XPosition>10</XPosition>
+        <YPosition>50</YPosition>            
+        <AutoSize>true</AutoSize>
+        <Checked>false</Checked>
+      </CheckBox>    
+    </CheckBoxCatalog>        
+    <RadioButtonCatalog>
+      <RadioButton>
+        <Name>radioButton_SPI_Mode</Name>
+        <Text>SPI Mode</Text>
+        <XPosition>10</XPosition>
+        <YPosition>70</YPosition>   
+      </RadioButton>    
+      <RadioButton>
+        <Name>radioButton_I2C_Mode</Name>
+        <Text>I2C Mode</Text>
+        <XPosition>10</XPosition>
+        <YPosition>90</YPosition>       
+      </RadioButton>
+    </RadioButtonCatalog>     
+  </ControlsCataLog>
+  <ControlsCataLog>         
+    <ButtonCatalog>      
+      <Button>   
+        <Name>button_Write_To_Device</Name>
+        <Text>Send Data To Device</Text>
+        <XPosition>10</XPosition>
+        <YPosition>20</YPosition>        
+        <Height>20</Height>
+        <Width>130</Width>      
+        <TextAlign>MiddleCenter</TextAlign>
+      </Button>          
+      <Button>   
+        <Name>button_Read_To_Device</Name>
+        <Text>Read Data From Device</Text>
+        <XPosition>10</XPosition>
+        <YPosition>50</YPosition>        
+        <Height>20</Height>
+        <Width>130</Width>      
+        <TextAlign>MiddleCenter</TextAlign>
+      </Button>                
+    </ButtonCatalog>         
+        <RadioButtonCatalog>
+      <RadioButton>
+        <Name>radioButton_SPI_CS0</Name>
+        <Text>Chip Select 0</Text>
+        <XPosition>150</XPosition>
+        <YPosition>10</YPosition>   
+      </RadioButton>    
+      <RadioButton>
+        <Name>radioButton_SPI_CS1</Name>
+        <Text>Chip Select 1</Text>
+        <XPosition>150</XPosition>
+        <YPosition>30</YPosition>       
+      </RadioButton>
+      <RadioButton>
+        <Name>radioButton_SPI_CS2</Name>
+        <Text>Chip Select 2</Text>
+        <XPosition>150</XPosition>
+        <YPosition>50</YPosition>       
+      </RadioButton>
+    </RadioButtonCatalog> 
+  </ControlsCataLog>
+</GroupControlsCatalog>  
