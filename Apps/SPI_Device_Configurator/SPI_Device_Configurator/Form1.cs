@@ -121,7 +121,7 @@ namespace SPI_Device_Configurator
             switch(bridgeName)
             {
                 case "CH341":
-
+                    
                     if((this.Controls["groupBox_BridgeChip_Options"]).Controls.ContainsKey("CheckBox_SetStream_B7"))
                     {
                         CheckBox myB7CheckBox = (CheckBox)(this.Controls["groupBox_BridgeChip_Options"]).Controls["CheckBox_SetStream_B7"];
@@ -386,7 +386,32 @@ namespace SPI_Device_Configurator
         }
 
         void DoOn_WriteToDevice(object sender, EventArgs e)
-        {
+        {            
+            switch(bridgeSelected)
+            {
+                case "CH341":
+
+                    if ((this.Controls["groupBox_DataTRansfer"]).Controls.ContainsKey("radioButton_SPI_CS0"))
+                    {
+                        RadioButton CS0myRadioButton = (RadioButton)(this.Controls["groupBox_DataTRansfer"]).Controls["radioButton_SPI_CS0"];
+                        retval[1] |= (CS0myRadioButton.Checked ? (byte)0x01 : (byte)0x00);
+                    }
+
+                    if ((this.Controls["groupBox_DataTRansfer"]).Controls.ContainsKey("radioButton_SPI_CS1"))
+                    {
+                        RadioButton CS1myRadioButton = (RadioButton)(this.Controls["groupBox_DataTRansfer"]).Controls["radioButton_SPI_CS1"];
+                        retval[1] |= (CS1myRadioButton.Checked ? (byte)0x02 : (byte)0x00);
+                    }
+
+                    if ((this.Controls["groupBox_DataTRansfer"]).Controls.ContainsKey("radioButton_SPI_CS2"))
+                    {
+                        RadioButton CS2myRadioButton = (RadioButton)(this.Controls["groupBox_DataTRansfer"]).Controls["radioButton_SPI_CS2"];
+                        retval[1] |= (CS2myRadioButton.Checked ? (byte)0x04 : (byte)0x00);
+                    }
+
+                    break;
+            }
+
             richTextBox_Log.AppendText("Send Bridge Data Click" + Environment.NewLine);
         }
 

@@ -13,6 +13,7 @@ namespace SerialBridgeCH341Driver
     public class CH341Driver: SerialBridge
     {
         CH341A myCH341Bridge;
+        byte chipSelectToUse = 0;
 
         public CH341Driver()
         {
@@ -73,6 +74,7 @@ namespace SerialBridgeCH341Driver
 
         public override bool SendConfigData(byte[] configDataToSend)
         {
+           chipSelectToUse = configDataToSend[1];
            return myCH341Bridge.SetStream(configDataToSend[0]);
         }
 
