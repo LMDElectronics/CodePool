@@ -8,11 +8,18 @@ using System.Diagnostics;
 using CH341;
 using InterfaceSerialBridge;
 
+using System.Configuration;
+
 namespace SerialBridgeCH341Driver
 {
     public class CH341Driver: SerialBridge
     {
         CH341A myCH341Bridge;
+
+        byte chipSelectToUse;
+        string spiInterfaceSpeed;
+        bool spiCountSingle;
+        bool bitOrderMsb;
 
         public CH341Driver()
         {
@@ -27,7 +34,9 @@ namespace SerialBridgeCH341Driver
         ~CH341Driver()
         {
 
-        }               
+        }
+
+        public override event EventInterruptReceived OnInterruptReceived;
 
         public override bool Open()
         {
@@ -63,17 +72,78 @@ namespace SerialBridgeCH341Driver
 
         public override bool Init()
         {
-            throw new NotImplementedException();
+            bool retVal = false;
+            byte configData = 0;
+
+            ExeConfigurationFileMap cfgFile = new ExeConfigurationFileMap();
+
+            cfgFile.ExeConfigFilename = $@"{System.Reflection.Assembly.GetExecutingAssembly().Location}.config";
+
+            Configuration config = ConfigurationManager.OpenMappedExeConfiguration(cfgFile, ConfigurationUserLevel.None); 
+
+            Debug.WriteLine($"{config}"); System.Diagnostics.Debug.WriteLine($"{config?.AppSettings.Settings["Serial Port Name"]?.Value}");
+
+            try
+            {
+                chipSelectToUse = byte.Parse(config?.AppSettings.Settings["ChipSelectToUse"]?.Value);
+                spiInterfaceSpeed = config?.AppSettings.Settings["InterfaceSpeedInKhz"]?.Value;
+                spiCountSingle = (config?.AppSettings.Settings["SPIIOCount"]?.Value == "single") ? true : false;
+                bitOrderMsb = (config?.AppSettings.Settings["BitOrder"]?.Value == "MSB") ? true : false;
+
+                switch (spiInterfaceSpeed)
+                {
+                    case "20":
+                        configData |= 0x00;
+                        break;
+
+                    case "100":
+                        configData |= 0x01;
+                        break;
+
+                    case "400":
+                        configData |= 0x02;
+                        break;
+
+                    case "750":
+                        configData |= 0x03;
+                        break;
+
+                    default:
+                        configData |= 0x01;
+                        break;
+                }
+
+                if (spiCountSingle)
+                {
+                    configData &= 0xfb;
+                }
+                else
+                {
+                    configData |= 0x04;
+                }                    
+                
+                if(bitOrderMsb)
+                {
+                    configData |= 0x80;
+                }
+                else
+                {
+                    configData &= 0x7F;
+                }
+
+                retVal = true;
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+
+            return retVal;
         }
 
         public override bool IsOpen()
         {
             throw new NotImplementedException();
-        }
-
-        public override bool SendConfigData(byte[] configDataToSend)
-        {
-           return myCH341Bridge.SetStream(configDataToSend[0]);
         }
 
         public override bool SendData(byte[] dataToSend)
@@ -84,8 +154,6 @@ namespace SerialBridgeCH341Driver
         public override byte[] ReceiveData()
         {
             throw new NotImplementedException();
-        }
-
-        public override event EventInterruptReceived OnInterruptReceived;
+        }        
     }
 }

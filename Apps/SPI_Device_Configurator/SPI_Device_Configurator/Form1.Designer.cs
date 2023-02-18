@@ -39,9 +39,11 @@
 			this.label_Bridge = new System.Windows.Forms.Label();
 			this.comboBox_BridgeChip = new System.Windows.Forms.ComboBox();
 			this.groupBox_DataTRansfer = new System.Windows.Forms.GroupBox();
-			this.groupBox_BridgeChip_Options = new System.Windows.Forms.GroupBox();
+			this.button_Tx_Data = new System.Windows.Forms.Button();
+			this.button_Rx_Data = new System.Windows.Forms.Button();
 			this.groupBox_Log.SuspendLayout();
 			this.groupBox_Communications.SuspendLayout();
+			this.groupBox_DataTRansfer.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupBox_Log
@@ -49,7 +51,7 @@
 			this.groupBox_Log.Controls.Add(this.button_CopyText);
 			this.groupBox_Log.Controls.Add(this.button_Clear_Log);
 			this.groupBox_Log.Controls.Add(this.richTextBox_Log);
-			this.groupBox_Log.Location = new System.Drawing.Point(12, 278);
+			this.groupBox_Log.Location = new System.Drawing.Point(11, 184);
 			this.groupBox_Log.Name = "groupBox_Log";
 			this.groupBox_Log.Size = new System.Drawing.Size(603, 259);
 			this.groupBox_Log.TabIndex = 2;
@@ -154,28 +156,40 @@
 			// 
 			// groupBox_DataTRansfer
 			// 
-			this.groupBox_DataTRansfer.Location = new System.Drawing.Point(12, 184);
+			this.groupBox_DataTRansfer.Controls.Add(this.button_Rx_Data);
+			this.groupBox_DataTRansfer.Controls.Add(this.button_Tx_Data);
+			this.groupBox_DataTRansfer.Location = new System.Drawing.Point(168, 13);
 			this.groupBox_DataTRansfer.Name = "groupBox_DataTRansfer";
-			this.groupBox_DataTRansfer.Size = new System.Drawing.Size(603, 88);
+			this.groupBox_DataTRansfer.Size = new System.Drawing.Size(446, 165);
 			this.groupBox_DataTRansfer.TabIndex = 4;
 			this.groupBox_DataTRansfer.TabStop = false;
 			this.groupBox_DataTRansfer.Text = "Data Transfer";
 			// 
-			// groupBox_BridgeChip_Options
+			// button_Tx_Data
 			// 
-			this.groupBox_BridgeChip_Options.Location = new System.Drawing.Point(168, 13);
-			this.groupBox_BridgeChip_Options.Name = "groupBox_BridgeChip_Options";
-			this.groupBox_BridgeChip_Options.Size = new System.Drawing.Size(447, 165);
-			this.groupBox_BridgeChip_Options.TabIndex = 5;
-			this.groupBox_BridgeChip_Options.TabStop = false;
-			this.groupBox_BridgeChip_Options.Text = "Bridge Chip Config Options";
+			this.button_Tx_Data.Location = new System.Drawing.Point(6, 38);
+			this.button_Tx_Data.Name = "button_Tx_Data";
+			this.button_Tx_Data.Size = new System.Drawing.Size(137, 55);
+			this.button_Tx_Data.TabIndex = 0;
+			this.button_Tx_Data.Text = "Tx Data";
+			this.button_Tx_Data.UseVisualStyleBackColor = true;
+			this.button_Tx_Data.Click += new System.EventHandler(this.button_Tx_Data_Click);
+			// 
+			// button_Rx_Data
+			// 
+			this.button_Rx_Data.Location = new System.Drawing.Point(6, 99);
+			this.button_Rx_Data.Name = "button_Rx_Data";
+			this.button_Rx_Data.Size = new System.Drawing.Size(137, 54);
+			this.button_Rx_Data.TabIndex = 1;
+			this.button_Rx_Data.Text = "Rx Data";
+			this.button_Rx_Data.UseVisualStyleBackColor = true;
+			this.button_Rx_Data.Click += new System.EventHandler(this.button_Rx_Data_Click);
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(626, 549);
-			this.Controls.Add(this.groupBox_BridgeChip_Options);
+			this.ClientSize = new System.Drawing.Size(626, 450);
 			this.Controls.Add(this.groupBox_DataTRansfer);
 			this.Controls.Add(this.groupBox_Communications);
 			this.Controls.Add(this.groupBox_Log);
@@ -185,6 +199,7 @@
 			this.groupBox_Log.ResumeLayout(false);
 			this.groupBox_Communications.ResumeLayout(false);
 			this.groupBox_Communications.PerformLayout();
+			this.groupBox_DataTRansfer.ResumeLayout(false);
 			this.ResumeLayout(false);
 
         }
@@ -200,8 +215,9 @@
 		private System.Windows.Forms.Button button_Start_Bridge;
 		private System.Windows.Forms.Button button_CloseBridge;
 		private System.Windows.Forms.GroupBox groupBox_DataTRansfer;
-		private System.Windows.Forms.GroupBox groupBox_BridgeChip_Options;
 		private System.Windows.Forms.TextBox textBox_CommStatus;
+		private System.Windows.Forms.Button button_Rx_Data;
+		private System.Windows.Forms.Button button_Tx_Data;
 	}
 }
 

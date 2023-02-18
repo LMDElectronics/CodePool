@@ -181,11 +181,6 @@ namespace BridgeLoadLibraryLib
         {
             return mySerialBridge.Close();
         }
-         
-        public bool SendConfigData(byte[] configData)
-        {
-            return mySerialBridge.SendConfigData(configData);
-        }
 
         public bool SendData(byte[] dataToSend)
         {

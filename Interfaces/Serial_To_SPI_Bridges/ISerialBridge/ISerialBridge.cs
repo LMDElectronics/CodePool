@@ -20,8 +20,6 @@ namespace InterfaceSerialBridge
 
         bool Init();
 
-        bool SendConfigData(byte[] configDataToSend);
-
         bool SendData(byte[] dataToSend);
         byte[] ReceiveData();     
        
@@ -41,8 +39,6 @@ namespace InterfaceSerialBridge
         public string Model { get; protected set; }
 
         public abstract bool Init();
-
-        public abstract bool SendConfigData(byte[] configDataToSend);
 
         public abstract bool SendData(byte[] dataToSend);
         public abstract byte[] ReceiveData();       

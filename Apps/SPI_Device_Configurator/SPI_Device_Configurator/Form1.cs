@@ -94,7 +94,7 @@ namespace SPI_Device_Configurator
         // Starts the operations to communicate  and configure the selected bridge
         //*********************************************************************
         private void button_Start_Bridge_Click(object sender, EventArgs e)
-        {                        
+        {
             try
             {
                 bridgeSelected = comboBox_BridgeChip.SelectedItem.ToString();
@@ -105,7 +105,14 @@ namespace SPI_Device_Configurator
                 {                    
                     if (mySerialBridgeLib.Open())
                     {
-                        //TODO load configuration from file
+                        if(mySerialBridgeLib.Init())
+                        {
+                            richTextBox_Log.AppendText("Bridge: " + $"{bridgeSelected}" + " " + " Initialized OK"  + Environment.NewLine);
+                        }
+                        else
+                        {
+                            richTextBox_Log.AppendText("Failed Initializing the bridge: " + $"{bridgeSelected}" + Environment.NewLine);
+                        }
                     }
                     else
                     {
@@ -114,7 +121,7 @@ namespace SPI_Device_Configurator
                 }
                 else
                 {
-                    richTextBox_Log.AppendText("Failed, Openning the device " + $"{bridgeSelected}" + Environment.NewLine);
+                    richTextBox_Log.AppendText("Failed, loading bridge driver: " + $"{bridgeSelected}" + Environment.NewLine);
                 }
             }
             catch(Exception ex)
@@ -140,6 +147,16 @@ namespace SPI_Device_Configurator
             }
         }
 
+        private void button_Tx_Data_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button_Rx_Data_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private void button_Clear_Log_Click(object sender, EventArgs e)
         {
             richTextBox_Log.Clear();
@@ -155,16 +172,6 @@ namespace SPI_Device_Configurator
             {
                 Debug.WriteLine(ex.Message);
             }
-        }
-
-        void DoOn_WriteToDevice(object sender, EventArgs e)
-        {
-            richTextBox_Log.AppendText("Send Bridge Data Click" + Environment.NewLine);
-        }
-
-        void DoOn_ReadFromDevice(object sender, EventArgs e)
-        {
-            richTextBox_Log.AppendText("Read Bridge Data Click" + Environment.NewLine);
         }
     }
 }
