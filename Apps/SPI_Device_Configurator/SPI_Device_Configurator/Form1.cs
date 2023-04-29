@@ -108,11 +108,13 @@ namespace SPI_Device_Configurator
                         if(mySerialBridgeLib.Init())
                         {
                             textBox_CommStatus.Text = "CONNECTED";
-                            textBox_CommStatus.BackColor = Color.LightGreen;
+                            textBox_CommStatus.BackColor = Color.LightGreen;                            
 
                             EnableBridgeControls();
 
                             richTextBox_Log.AppendText("Bridge: " + $"{bridgeSelected}" + " " + " Initialized OK"  + Environment.NewLine);
+                            richTextBox_Log.AppendText("Bridge Model: " + $"{mySerialBridgeLib.Model}" + " " + " " + Environment.NewLine);
+                            richTextBox_Log.AppendText("Bridge FW Version: " + $"{mySerialBridgeLib.Version}" + " " + Environment.NewLine);
                         }
                         else
                         {
@@ -169,32 +171,52 @@ namespace SPI_Device_Configurator
             //TODO extract data from tx file 
             int counter = 0;
             string txDataFilePath = "";
+            int i = 0;
 
             byte[] dataArrayToSend;
 
+            if (mySerialBridgeLib == null)
+            {
+                return;
+            }
+
             txDataFilePath = ConfigurationManager.AppSettings.Get(Defines.TX_DATA_FILE_PATH);
 
-            // Read the file line by line  
-            foreach (string line in System.IO.File.ReadLines(txDataFilePath))
-            {             
-                //jump over comments
-                if (line[0] != '#')
+            try
+            {
+                // Read the file line by line  
+                foreach (string line in System.IO.File.ReadLines(txDataFilePath))
                 {
-                    //read each character and create a byte array with the data
-                    string[] values = line.Split(' ');
-                    dataArrayToSend = new byte[values.Length];
+                    //jump over comments
+                    if (line[0] != '#')
+                    {
+                        //read each character and create a byte array with the data
+                        string[] values = line.Split(' ');
+                        dataArrayToSend = new byte[values.Length];
 
-                    //hex string to valid byte 
-                    int count = 0;
-                    foreach(string dataByte in values)
-                    {                        
-                        dataArrayToSend[count] = byte.Parse(values[count], System.Globalization.NumberStyles.AllowHexSpecifier);
-                        count++;
+                        //hex string to valid byte 
+                        int count = 0;
+                        foreach (string dataByte in values)
+                        {
+                            dataArrayToSend[count] = byte.Parse(values[count], System.Globalization.NumberStyles.AllowHexSpecifier);
+                            count++;
+                        }
+                        count = 0;
+
+                        richTextBox_Log.AppendText("Sending Data: ");
+                        foreach (byte dataByte in dataArrayToSend)
+                        {
+                            richTextBox_Log.AppendText(string.Format("0x{0:X2} ", dataByte));
+                        }
+                        richTextBox_Log.AppendText(Environment.NewLine);
+
+                        mySerialBridgeLib.SendData(dataArrayToSend);                        
                     }
-                    count = 0;
-
-                    mySerialBridgeLib.SendData(dataArrayToSend);
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
 

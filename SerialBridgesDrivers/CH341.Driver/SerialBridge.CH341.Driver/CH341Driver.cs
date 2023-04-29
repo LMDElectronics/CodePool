@@ -162,7 +162,18 @@ namespace SerialBridgeCH341Driver
 
         public override bool SendData(byte[] dataToSend)
         {
-            throw new NotImplementedException();
+            byte iChipSelectConfig = 0;
+
+            switch(chipSelectToUse)
+            {
+                case 0: iChipSelectConfig = 0x80; break;
+                case 1: iChipSelectConfig = 0x81; break;
+                case 2: iChipSelectConfig = 0x82; break;
+            }
+
+            myCH341Bridge.StreamSPI4(iChipSelectConfig, ref dataToSend);
+
+            return true;
         }
 
         public override byte[] ReceiveData()
