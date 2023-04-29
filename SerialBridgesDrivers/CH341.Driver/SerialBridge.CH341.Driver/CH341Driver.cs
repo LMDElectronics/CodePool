@@ -67,7 +67,19 @@ namespace SerialBridgeCH341Driver
 
         public override bool Close()
         {
-            throw new NotImplementedException();
+            bool retVal = false;
+
+            try
+            {
+                myCH341Bridge.CloseDevice();
+                retVal = true;
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }            
+
+            return retVal;
         }
 
         public override bool Init()
@@ -130,6 +142,8 @@ namespace SerialBridgeCH341Driver
                 {
                     configData &= 0x7F;
                 }
+
+                myCH341Bridge.SetStream((uint)configData);
 
                 retVal = true;
             }

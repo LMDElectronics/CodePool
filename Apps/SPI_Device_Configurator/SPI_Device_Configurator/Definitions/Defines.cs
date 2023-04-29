@@ -19,6 +19,8 @@ namespace SPI_Device_Configurator
 		public const string CH341_DRIVER_ASSEMBLY_PATH = "CH341ExternalDriverAssembly";
 		public const string CH341_DRIVER_ASSEMBLY = "CH341";
 
+		public const string TX_DATA_FILE_PATH = "TxDataToSendFile";
+
 		public const int CONTROLS_LOADED_OK = 0;
 		public const int CONTROLS_REMOVED_OK = 0;
 

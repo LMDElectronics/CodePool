@@ -91,8 +91,7 @@ namespace BridgeLoadLibraryLib
                 if (_assemblyLoadedStatus == Defines.ASSEMBLY_LOADED_OK)
                 {
                     DetachEvents();
-
-                    mySerialBridge.Close();
+                   
                     mySerialBridge = null;
                 }
                 else
