@@ -222,7 +222,17 @@ namespace SPI_Device_Configurator
 
         private void button_Rx_Data_Click(object sender, EventArgs e)
         {
+            byte[] dataRcv;
+            int i;
 
+            dataRcv = mySerialBridgeLib.ReceiveData();
+
+            richTextBox_Log.AppendText("Data Received: ");
+            foreach (byte dataByte in dataRcv)
+            {
+                richTextBox_Log.AppendText(string.Format("0x{0:X2} ", dataByte));
+            }
+            richTextBox_Log.AppendText(Environment.NewLine);
         }
 
         private void button_Clear_Log_Click(object sender, EventArgs e)

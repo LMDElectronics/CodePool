@@ -21,6 +21,8 @@ namespace SerialBridgeCH341Driver
         bool spiCountSingle;
         bool bitOrderMsb;
 
+        byte[] dataRecv;
+
         public CH341Driver()
         {
             myCH341Bridge = new CH341A(0);
@@ -35,6 +37,9 @@ namespace SerialBridgeCH341Driver
         {
 
         }
+
+        public override event EventDataReceived OnDataReceived;
+        public override event EventDataTransmited OnDataTransmitted;
 
         public override event EventInterruptReceived OnInterruptReceived;
 
@@ -173,12 +178,17 @@ namespace SerialBridgeCH341Driver
 
             myCH341Bridge.StreamSPI4(iChipSelectConfig, ref dataToSend);
 
+            dataRecv = dataToSend.ToArray();
+
+            OnDataTransmitted.Invoke();
+            OnDataReceived.Invoke(dataToSend);
+
             return true;
         }
 
         public override byte[] ReceiveData()
         {
-            throw new NotImplementedException();
+            return dataRecv;
         }        
     }
 }

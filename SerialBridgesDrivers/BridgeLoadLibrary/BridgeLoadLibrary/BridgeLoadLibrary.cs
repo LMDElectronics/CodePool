@@ -17,6 +17,9 @@ namespace BridgeLoadLibraryLib
     {
         public event EventInterruptReceived OnInterruptReceived;
 
+        public event EventDataTransmited OnDataTransmitted;
+        public event EventDataReceived OnDataReceived;
+
         //interface to be load dinamically with the selected dll
         ISerialBridge mySerialBridge;
 
@@ -108,11 +111,16 @@ namespace BridgeLoadLibraryLib
         private void AttachEvents()
         {
             mySerialBridge.OnInterruptReceived += DoOn_InterruptReceived;
+            mySerialBridge.OnDataTransmitted += DoOn_DataTransmitted;
+            mySerialBridge.OnDataReceived += DoOn_DataReceived;
         }
 
         private void DetachEvents()
         {
             mySerialBridge.OnInterruptReceived -= DoOn_InterruptReceived;
+            mySerialBridge.OnDataTransmitted -= DoOn_DataTransmitted;
+            mySerialBridge.OnDataReceived -= DoOn_DataReceived;
+
         }
 
         public int IsRegistered()
@@ -216,6 +224,16 @@ namespace BridgeLoadLibraryLib
         public void DoOn_InterruptReceived(byte[] interruptbytes)
         {
             OnInterruptReceived?.Invoke(interruptbytes);
+        }
+
+        public void DoOn_DataTransmitted()
+        {
+            OnDataTransmitted?.Invoke();
+        }
+
+        public void DoOn_DataReceived(byte[] dataReceived)
+        {
+            OnDataReceived?.Invoke(dataReceived);
         }
     }
 }

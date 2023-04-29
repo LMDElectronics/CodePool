@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace InterfaceSerialBridge
 {
     public delegate void EventInterruptReceived(byte[] interruptBytes);
+    public delegate void EventDataTransmited();
+    public delegate void EventDataReceived(byte[] dataReceived);
 
     public interface ISerialBridge
     {
@@ -21,8 +23,11 @@ namespace InterfaceSerialBridge
         bool Init();
 
         bool SendData(byte[] dataToSend);
-        byte[] ReceiveData();     
-       
+        byte[] ReceiveData();
+
+        event EventDataReceived OnDataReceived;
+        event EventDataTransmited OnDataTransmitted;
+
         event EventInterruptReceived OnInterruptReceived;        
     }
 
@@ -42,6 +47,9 @@ namespace InterfaceSerialBridge
 
         public abstract bool SendData(byte[] dataToSend);
         public abstract byte[] ReceiveData();       
+
+        public abstract event EventDataReceived OnDataReceived;
+        public abstract event EventDataTransmited OnDataTransmitted;
 
         public abstract event EventInterruptReceived OnInterruptReceived;
     }
