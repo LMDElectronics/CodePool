@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bridge.CH341.API", "..\..\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerialBridge.CH341.Driver", "..\..\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\SerialBridge.CH341.Driver.csproj", "{EA4B93C5-8640-498A-982C-8DFD6E39C344}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonDefinitions", "..\..\Common\CommonDefinitions\CommonDefinitions.csproj", "{0027B2F3-0FBD-4577-AF33-629F2FC5AE71}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{EA4B93C5-8640-498A-982C-8DFD6E39C344}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA4B93C5-8640-498A-982C-8DFD6E39C344}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA4B93C5-8640-498A-982C-8DFD6E39C344}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0027B2F3-0FBD-4577-AF33-629F2FC5AE71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0027B2F3-0FBD-4577-AF33-629F2FC5AE71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0027B2F3-0FBD-4577-AF33-629F2FC5AE71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0027B2F3-0FBD-4577-AF33-629F2FC5AE71}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{0AC113FF-924D-4C2B-83CD-7C9CDE688BCC} = {FE791C06-3269-4B73-A16B-18B72C5C088A}
 		{E7D4D981-FC1C-4646-BD07-1A79D9612CF8} = {74E6ED87-2548-4670-B4DF-CC5F4481149F}
 		{EA4B93C5-8640-498A-982C-8DFD6E39C344} = {74E6ED87-2548-4670-B4DF-CC5F4481149F}
+		{0027B2F3-0FBD-4577-AF33-629F2FC5AE71} = {3DDAFFFF-EFE1-4E77-A6D8-B7286CD0463F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B073521-8A6D-4D08-B4CE-D0495C799124}

@@ -9,14 +9,20 @@ using System.Reflection;
 
 using System.IO;
 using InterfaceSerialBridge;
+using CommonDefinitions;
 
 namespace BridgeLoadLibraryLib
 {
     [Serializable]
     public class BridgeLoadLibrary: MarshalByRefObject
     {
-        public event EventInterruptReceived OnInterruptReceived;
+        public delegate void EventInterruptReceived(byte[] interruptBytes);
+        public delegate void EventDataTransmited();
+        public delegate void EventDataReceived(byte[] dataReceived);
+        public delegate void EventOnLog(Definitions.LogLevel logLevel, string dataToLog);
 
+        public event EventOnLog OnLog;
+        public event EventInterruptReceived OnInterruptReceived;
         public event EventDataTransmited OnDataTransmitted;
         public event EventDataReceived OnDataReceived;
 
@@ -113,6 +119,7 @@ namespace BridgeLoadLibraryLib
             mySerialBridge.OnInterruptReceived += DoOn_InterruptReceived;
             mySerialBridge.OnDataTransmitted += DoOn_DataTransmitted;
             mySerialBridge.OnDataReceived += DoOn_DataReceived;
+            mySerialBridge.OnLog += DoOn_Log;
         }
 
         private void DetachEvents()
@@ -120,7 +127,7 @@ namespace BridgeLoadLibraryLib
             mySerialBridge.OnInterruptReceived -= DoOn_InterruptReceived;
             mySerialBridge.OnDataTransmitted -= DoOn_DataTransmitted;
             mySerialBridge.OnDataReceived -= DoOn_DataReceived;
-
+            mySerialBridge.OnLog -= DoOn_Log;
         }
 
         public int IsRegistered()
@@ -221,19 +228,24 @@ namespace BridgeLoadLibraryLib
         //*********************************************************************
         // Event callbacks for Serial Bridge Object Loaded
         //*********************************************************************  
-        public void DoOn_InterruptReceived(byte[] interruptbytes)
+        private void DoOn_InterruptReceived(byte[] interruptbytes)
         {
             OnInterruptReceived?.Invoke(interruptbytes);
         }
 
-        public void DoOn_DataTransmitted()
+        private void DoOn_DataTransmitted()
         {
             OnDataTransmitted?.Invoke();
         }
 
-        public void DoOn_DataReceived(byte[] dataReceived)
+        private void DoOn_DataReceived(byte[] dataReceived)
         {
             OnDataReceived?.Invoke(dataReceived);
+        }
+
+        private void DoOn_Log(Definitions.LogLevel loglevel, string dataToLog)
+        {
+            OnLog?.Invoke(loglevel, dataToLog);
         }
     }
 }

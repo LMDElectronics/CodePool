@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using CommonDefinitions;
+
 namespace InterfaceSerialBridge
 {
+    public delegate void EventOnLog(Definitions.LogLevel logLevel, string dataToLog);
     public delegate void EventInterruptReceived(byte[] interruptBytes);
     public delegate void EventDataTransmited();
     public delegate void EventDataReceived(byte[] dataReceived);
@@ -24,6 +27,8 @@ namespace InterfaceSerialBridge
 
         bool SendData(byte[] dataToSend);
         byte[] ReceiveData();
+
+        event EventOnLog OnLog;
 
         event EventDataReceived OnDataReceived;
         event EventDataTransmited OnDataTransmitted;
@@ -46,7 +51,9 @@ namespace InterfaceSerialBridge
         public abstract bool Init();
 
         public abstract bool SendData(byte[] dataToSend);
-        public abstract byte[] ReceiveData();       
+        public abstract byte[] ReceiveData();
+
+        public abstract event EventOnLog OnLog;
 
         public abstract event EventDataReceived OnDataReceived;
         public abstract event EventDataTransmited OnDataTransmitted;

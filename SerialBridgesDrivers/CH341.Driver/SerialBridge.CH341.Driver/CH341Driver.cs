@@ -5,8 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Diagnostics;
+using System.Reflection;
+
 using CH341;
 using InterfaceSerialBridge;
+using CommonDefinitions;
 
 using System.Configuration;
 
@@ -26,17 +29,22 @@ namespace SerialBridgeCH341Driver
         public CH341Driver()
         {
             myCH341Bridge = new CH341A(0);
+            OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + "Created");
+
         }
 
         public CH341Driver(int devNumber)
         {
             myCH341Bridge = new CH341A((uint)devNumber);
+            OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + "Created");
         }
 
         ~CH341Driver()
         {
-
+            OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + "Destroyed");
         }
+
+        public override event EventOnLog OnLog; 
 
         public override event EventDataReceived OnDataReceived;
         public override event EventDataTransmited OnDataTransmitted;
@@ -53,11 +61,15 @@ namespace SerialBridgeCH341Driver
                 {
                     Model = myCH341Bridge.GetDeviceName();
                     Version = myCH341Bridge.GetDrvVersion().ToString();
-                    
+
+                    OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + "Ok");
+
                     retVal = true;
                 }
                 else
                 {
+                    OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + "Not Ok");
+
                     retVal = false;
                 }
 
@@ -77,6 +89,9 @@ namespace SerialBridgeCH341Driver
             try
             {
                 myCH341Bridge.CloseDevice();
+
+                OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + "Ok");
+
                 retVal = true;
             }
             catch(Exception ex)
@@ -150,6 +165,8 @@ namespace SerialBridgeCH341Driver
 
                 myCH341Bridge.SetStream((uint)configData);
 
+                OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + "Ok");
+
                 retVal = true;
             }
             catch(Exception ex)
@@ -168,6 +185,7 @@ namespace SerialBridgeCH341Driver
         public override bool SendData(byte[] dataToSend)
         {
             byte iChipSelectConfig = 0;
+            string data;
 
             switch(chipSelectToUse)
             {
@@ -176,18 +194,25 @@ namespace SerialBridgeCH341Driver
                 case 2: iChipSelectConfig = 0x82; break;
             }
 
+            data = BitConverter.ToString(dataToSend);
+            OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + $"Data Sent: {data}");
+
             myCH341Bridge.StreamSPI4(iChipSelectConfig, ref dataToSend);
+
+            data = BitConverter.ToString(dataToSend);
+            OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + $"Data Received: {data}");
 
             dataRecv = dataToSend.ToArray();
 
             OnDataTransmitted.Invoke();
-            OnDataReceived.Invoke(dataToSend);
+            OnDataReceived.Invoke(dataToSend);            
 
             return true;
         }
 
         public override byte[] ReceiveData()
-        {
+        {            
+            OnLog?.Invoke(Definitions.LogLevel.ALL, this.GetType().Name + " " + MethodBase.GetCurrentMethod().Name + " " + "Getting data received");
             return dataRecv;
         }        
     }

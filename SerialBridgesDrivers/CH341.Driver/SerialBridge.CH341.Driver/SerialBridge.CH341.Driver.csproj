@@ -54,6 +54,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\CommonDefinitions\CommonDefinitions.csproj">
+      <Project>{0027b2f3-0fbd-4577-af33-629f2fc5ae71}</Project>
+      <Name>CommonDefinitions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\ISerialBridge.csproj">
       <Project>{926a02b6-2827-4991-ace9-797ee6286d1e}</Project>
       <Name>ISerialBridge</Name>

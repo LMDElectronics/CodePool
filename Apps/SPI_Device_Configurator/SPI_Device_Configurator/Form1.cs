@@ -11,16 +11,19 @@ using System.Diagnostics;
 using System.Configuration;
 
 using BridgeLoadLibraryLib;
+using CommonDefinitions;
 
 namespace SPI_Device_Configurator
 {    
     public partial class Form1 : Form
     {
-        BridgeLoadLibrary mySerialBridgeLib;        
+        BridgeLoadLibrary mySerialBridgeLib;               
 
         string bridgeSelected = "";
 
         List<string> myGroupBoxNamesList = new List<string>();
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public Form1()
         {
@@ -55,6 +58,22 @@ namespace SPI_Device_Configurator
             InitForm();
         }
 
+        private void AttachEvents()
+        {
+            mySerialBridgeLib.OnInterruptReceived += DoOn_InterruptReceived;
+            mySerialBridgeLib.OnDataReceived += DoOn_DataReceived;
+            mySerialBridgeLib.OnDataTransmitted += DoOn_DataTransmitted;
+            mySerialBridgeLib.OnLog += DoOn_Log;
+        }
+
+        private void DetachEvents()
+        {
+            mySerialBridgeLib.OnInterruptReceived -= DoOn_InterruptReceived;
+            mySerialBridgeLib.OnDataReceived -= DoOn_DataReceived;
+            mySerialBridgeLib.OnDataTransmitted -= DoOn_DataTransmitted;
+            mySerialBridgeLib.OnLog -= DoOn_Log;
+        }
+
         //*********************************************************************
         // Loads the selected bridge Assembly
         //*********************************************************************
@@ -66,10 +85,13 @@ namespace SPI_Device_Configurator
             try
             {
                 pathToAssembly = ConfigurationManager.AppSettings.Get(Defines.CH341_DRIVER_ASSEMBLY_PATH);
-                mySerialBridgeLib = new BridgeLoadLibrary(pathToAssembly);
+                mySerialBridgeLib = new BridgeLoadLibrary(pathToAssembly);                
 
-                if(mySerialBridgeLib.assemblyLoadedStatus == BridgeLoadLibraryLib.Defines.ASSEMBLY_LOADED_OK)
+                if (mySerialBridgeLib.assemblyLoadedStatus == BridgeLoadLibraryLib.Defines.ASSEMBLY_LOADED_OK)
                 {
+
+                    AttachEvents();
+
                     richTextBox_Log.AppendText("Device: " + $"{serialbridgeText }" + " Loaded OK!..." + Environment.NewLine);
                 }
                 else
@@ -148,6 +170,8 @@ namespace SPI_Device_Configurator
 
                 if(mySerialBridgeLib != null)
                 {
+                    DetachEvents();
+
                     mySerialBridgeLib.Close();
                     mySerialBridgeLib = null;
 
@@ -222,17 +246,7 @@ namespace SPI_Device_Configurator
 
         private void button_Rx_Data_Click(object sender, EventArgs e)
         {
-            byte[] dataRcv;
-            int i;
 
-            dataRcv = mySerialBridgeLib.ReceiveData();
-
-            richTextBox_Log.AppendText("Data Received: ");
-            foreach (byte dataByte in dataRcv)
-            {
-                richTextBox_Log.AppendText(string.Format("0x{0:X2} ", dataByte));
-            }
-            richTextBox_Log.AppendText(Environment.NewLine);
         }
 
         private void button_Clear_Log_Click(object sender, EventArgs e)
@@ -250,6 +264,38 @@ namespace SPI_Device_Configurator
             {
                 Debug.WriteLine(ex.Message);
             }
+        }
+
+        //*********************************************************************
+        // Events
+        //*********************************************************************
+        private void DoOn_InterruptReceived(byte[] intbytesReceived)
+        {
+            int i = 0;
+        }
+                                                        
+        private void DoOn_DataReceived(byte[] dataReceived)
+        {
+            richTextBox_Log.AppendText("Data Received: ");
+            foreach (byte dataByte in dataReceived)
+            {
+                richTextBox_Log.AppendText(string.Format("0x{0:X2} ", dataByte));
+            }
+            richTextBox_Log.AppendText(Environment.NewLine);
+
+            //TODO
+            //Save Rx into the rxDataFile
+        }
+
+        private void DoOn_DataTransmitted()
+        {
+            int i = 0;
+        }
+
+        private void DoOn_Log(Definitions.LogLevel loglevel, string dataToLog)
+        {
+            //log data
+            log.Info(dataToLog);
         }
     }
 }
