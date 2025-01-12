@@ -1,0 +1,2 @@
+#define MSGBUILDER_API __declspec(dllexport)
+#define MSGBUILDER_API __declspec(dllimport)

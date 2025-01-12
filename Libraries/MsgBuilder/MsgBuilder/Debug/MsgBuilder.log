@@ -1,0 +1,8 @@
+﻿  pch.cpp
+  dllmain.cpp
+  MsgBuilder.cpp
+c:\users\max pc\documents\repositories\codepool\libraries\msgbuilder\msgbuilder\msgbuilder.h(54): warning C4091: 'extern __declspec(dllexport)': ignored on left of 'TMessage' when no variable is declared
+  MSGBUILDER_EXPORTS está definido
+  Generating Code...
+     Creating library C:\Users\MAX PC\Documents\repositories\CodePool\Libraries\MsgBuilder\Debug\MSGBUILDER.lib and object C:\Users\MAX PC\Documents\repositories\CodePool\Libraries\MsgBuilder\Debug\MSGBUILDER.exp
+  MsgBuilder.vcxproj -> C:\Users\MAX PC\Documents\repositories\CodePool\Libraries\MsgBuilder\Debug\MSGBUILDER.dll
