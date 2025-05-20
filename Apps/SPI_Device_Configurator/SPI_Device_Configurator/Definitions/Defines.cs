@@ -16,8 +16,7 @@ namespace SPI_Device_Configurator
 		public const string CALLBACK_OPERATION_ATTACH = "ATTACH CALLBACKS";
 		public const string CALLBACK_OPERATION_DETTACH = "DETTACH CALLBACK";
 
-		public const string CH341_DRIVER_ASSEMBLY_PATH = "CH341ExternalDriverAssembly";
-		public const string CH341_DRIVER_ASSEMBLY = "CH341";
+		public const string DRIVER_ASSEMBLY_PATH = "ExternalDriverAssembly";
 
 		public const int CONTROLS_LOADED_OK = 0;
 		public const int CONTROLS_REMOVED_OK = 0;

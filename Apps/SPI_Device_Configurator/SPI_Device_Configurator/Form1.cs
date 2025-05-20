@@ -81,7 +81,7 @@ namespace SPI_Device_Configurator
 
             try
             {
-                pathToAssembly = ConfigurationManager.AppSettings.Get(Defines.CH341_DRIVER_ASSEMBLY_PATH);
+                pathToAssembly = ConfigurationManager.AppSettings.Get(Defines.DRIVER_ASSEMBLY_PATH);
                 mySerialBridgeLib = new BridgeLoadLibrary(pathToAssembly);
 
                 if(mySerialBridgeLib.assemblyLoadedStatus == BridgeLoadLibraryLib.Defines.ASSEMBLY_LOADED_OK)
@@ -254,14 +254,16 @@ namespace SPI_Device_Configurator
                          int errorCreatingControls = Defines.CONTROLS_LOADED_UNKNOWN_ERROR;
 
                         //create form controls for bridge
-                        richTextBox_Log.AppendText("Creating bridge: " + $"{bridgeSelected}" + " configuration controls..." + Environment.NewLine);
+                        richTextBox_Log.AppendText("Creating bridge: " + $"{bridgeSelected}" + " configuration controls...");
 
-                        errorCreatingControls = SerialBridgeControls.CreateControlsFromBridgeConfigFile(this, bridgeSelected, myGroupBoxNamesList);
-                        ButtonsClickCallBacks(Defines.CALLBACK_OPERATION_ATTACH); 
+                        errorCreatingControls = SerialBridgeControls.CreateControlsFromBridgeConfigFile(this, bridgeSelected, myGroupBoxNamesList);                        
 
                         if (errorCreatingControls == Defines.CONTROLS_LOADED_OK)
                         {
                             richTextBox_Log.AppendText("OK!" + Environment.NewLine);
+
+                            //attaching callbacks
+                            ButtonsClickCallBacks(Defines.CALLBACK_OPERATION_ATTACH);
 
                             textBox_CommStatus.BackColor = Color.Yellow;
                             textBox_CommStatus.Text = "NOT CONFIGURED";
@@ -299,6 +301,7 @@ namespace SPI_Device_Configurator
             }
             catch(Exception ex)
             {
+                richTextBox_Log.AppendText($"Failed, Openning the device, Exception: {ex.Message}" + Environment.NewLine);
                 Debug.WriteLine(ex.Message);
             }
         }
