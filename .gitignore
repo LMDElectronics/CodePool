@@ -1,7 +1,8 @@
 *.obj
 *.pdb
 *.exe
+*.suo
 obj/
 bin/
-vs/
+.vs/
 packages/
