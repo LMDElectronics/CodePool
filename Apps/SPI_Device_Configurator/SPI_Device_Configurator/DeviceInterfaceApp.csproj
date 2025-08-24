@@ -122,7 +122,7 @@
     <Folder Include="BridgeDataParser\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SerialBridgesDrivers\BridgeLoadLibrary\BridgeLoadLibrary\BridgeLoadLibrary.csproj">
+    <ProjectReference Include="..\..\..\Drivers\SerialBridgesDrivers\BridgeLoadLibrary\BridgeLoadLibrary\BridgeLoadLibrary.csproj">
       <Project>{0ac113ff-924d-4c2b-83cd-7c9cde688bcc}</Project>
       <Name>BridgeLoadLibrary</Name>
     </ProjectReference>

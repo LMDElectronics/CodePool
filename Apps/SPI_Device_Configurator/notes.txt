@@ -1,0 +1,5 @@
+App to load an I2C/SPI bridge to Tx and Rx data from a I2C/SPI device
+---------------------------------------------------------------------
+
+App to select a bridge from a list and send and receive data from a i2C/SPI device
+

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29911.84
+# Visual Studio 15
+VisualStudioVersion = 15.0.35431.46
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceInterfaceApp", "SPI_Device_Configurator\DeviceInterfaceApp.csproj", "{2AF4F539-5D14-42C0-BC5F-F983B24764BB}"
 EndProject
@@ -17,11 +17,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CH341", "CH341", "{74E6ED87
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISerialBridge", "..\..\Interfaces\Serial_To_SPI_Bridges\ISerialBridge\ISerialBridge.csproj", "{926A02B6-2827-4991-ACE9-797EE6286D1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BridgeLoadLibrary", "..\..\SerialBridgesDrivers\BridgeLoadLibrary\BridgeLoadLibrary\BridgeLoadLibrary.csproj", "{0AC113FF-924D-4C2B-83CD-7C9CDE688BCC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BridgeLoadLibrary", "..\..\Drivers\SerialBridgesDrivers\BridgeLoadLibrary\BridgeLoadLibrary\BridgeLoadLibrary.csproj", "{0AC113FF-924D-4C2B-83CD-7C9CDE688BCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bridge.CH341.API", "..\..\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.API\Bridge.CH341.API.csproj", "{E7D4D981-FC1C-4646-BD07-1A79D9612CF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bridge.CH341.API", "..\..\Drivers\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.API\Bridge.CH341.API.csproj", "{E7D4D981-FC1C-4646-BD07-1A79D9612CF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerialBridge.CH341.Driver", "..\..\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\SerialBridge.CH341.Driver.csproj", "{EA4B93C5-8640-498A-982C-8DFD6E39C344}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerialBridge.CH341.Driver", "..\..\Drivers\SerialBridgesDrivers\CH341.Driver\SerialBridge.CH341.Driver\SerialBridge.CH341.Driver.csproj", "{EA4B93C5-8640-498A-982C-8DFD6E39C344}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
