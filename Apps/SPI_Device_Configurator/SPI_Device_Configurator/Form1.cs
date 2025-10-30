@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Configuration;
+using System.Reflection;
 
 using BridgeLoadLibraryLib;
 
@@ -16,6 +17,8 @@ namespace SPI_Device_Configurator
 {    
     public partial class Form1 : Form
     {
+        public string[] DeviceNamesArray = { "CH341", "U1", "U2", "U3" };
+
         BridgeLoadLibrary mySerialBridgeLib;        
 
         string bridgeSelected = "";
@@ -24,7 +27,7 @@ namespace SPI_Device_Configurator
 
         public Form1()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         private void DisableBridgeControls()
@@ -39,6 +42,10 @@ namespace SPI_Device_Configurator
 
         private void InitForm()
         {
+            BindingSource bs = new BindingSource();
+            bs.DataSource = DeviceNamesArray;
+            comboBox_BridgeChip.DataSource = bs;
+
             if (comboBox_BridgeChip.Items.Count > 0)
             {
                 comboBox_BridgeChip.SelectedIndex = 0;
@@ -59,6 +66,22 @@ namespace SPI_Device_Configurator
         }
 
         //*********************************************************************
+        // Logs Data
+        //*********************************************************************
+        private void LogData(string dataToLog)
+        {
+            richTextBox_Log.AppendText(dataToLog + Environment.NewLine); 
+        }
+
+        //*********************************************************************
+        // Logs Exception
+        //*********************************************************************
+        private void LogException(string exceptionMessage, string module = "")
+        {
+            richTextBox_Log.AppendText($"Exception: {exceptionMessage} in {module}" + Environment.NewLine);
+        }
+
+        //*********************************************************************
         // Gets the list of names of Form empty group boxes 
         //*********************************************************************
         private List<string> GetGroupBoxesToBeFilled()
@@ -72,6 +95,30 @@ namespace SPI_Device_Configurator
         }
 
         //*********************************************************************
+        // Gets the device driver dll path from device combobox list 
+        //*********************************************************************
+        private string GetDeviceDriverPath(string data)
+        {
+            string retVal = "";
+
+            try
+            {
+                switch(data)
+                {
+                    case "CH341": retVal = ConfigurationManager.AppSettings.Get(data + "ExternalDriverAssembly"); break;                       
+                    default: break;
+                }
+
+                return retVal;
+            }
+            catch(Exception ex)
+            {
+                LogException(ex.Message);
+                return "";
+            }            
+        }
+
+        //*********************************************************************
         // Loads the selected bridge Assembly
         //*********************************************************************
         private bool LoadAssembly(string serialbridgeText)
@@ -81,7 +128,7 @@ namespace SPI_Device_Configurator
 
             try
             {
-                pathToAssembly = ConfigurationManager.AppSettings.Get(Defines.DRIVER_ASSEMBLY_PATH);
+                pathToAssembly = GetDeviceDriverPath(serialbridgeText);
                 mySerialBridgeLib = new BridgeLoadLibrary(pathToAssembly);
 
                 if(mySerialBridgeLib.assemblyLoadedStatus == BridgeLoadLibraryLib.Defines.ASSEMBLY_LOADED_OK)
@@ -336,6 +383,8 @@ namespace SPI_Device_Configurator
                     button_Start_Bridge.Enabled = true;
 
                     mySerialBridgeLib = null;
+
+                    richTextBox_Log.Clear();
                 }
                 else
                 {
@@ -394,22 +443,27 @@ namespace SPI_Device_Configurator
             {
                 case "CH341":
 
-                    if ((this.Controls["groupBox_DataTRansfer"]).Controls.ContainsKey("radioButton_SPI_CS0"))
+                    try
                     {
-                        RadioButton CS0myRadioButton = (RadioButton)(this.Controls["groupBox_DataTRansfer"]).Controls["radioButton_SPI_CS0"];
-                        //retval[1] |= (CS0myRadioButton.Checked ? (byte)0x01 : (byte)0x00);
-                    }
 
-                    if ((this.Controls["groupBox_DataTRansfer"]).Controls.ContainsKey("radioButton_SPI_CS1"))
-                    {
-                        RadioButton CS1myRadioButton = (RadioButton)(this.Controls["groupBox_DataTRansfer"]).Controls["radioButton_SPI_CS1"];
-                        //retval[1] |= (CS1myRadioButton.Checked ? (byte)0x02 : (byte)0x00);
-                    }
+                        if ((this.Controls["groupBox_DataTRansfer"]).Controls.ContainsKey("radioButton_SPI_CS0"))
+                        {
+                            RadioButton CS0myRadioButton = (RadioButton)(this.Controls["groupBox_DataTRansfer"]).Controls["radioButton_SPI_CS0"];
+                        }
 
-                    if ((this.Controls["groupBox_DataTRansfer"]).Controls.ContainsKey("radioButton_SPI_CS2"))
+                        if ((this.Controls["groupBox_DataTRansfer"]).Controls.ContainsKey("radioButton_SPI_CS1"))
+                        {
+                            RadioButton CS1myRadioButton = (RadioButton)(this.Controls["groupBox_DataTRansfer"]).Controls["radioButton_SPI_CS1"];
+                        }
+
+                        if ((this.Controls["groupBox_DataTRansfer"]).Controls.ContainsKey("radioButton_SPI_CS2"))
+                        {
+                            RadioButton CS2myRadioButton = (RadioButton)(this.Controls["groupBox_DataTRansfer"]).Controls["radioButton_SPI_CS2"];
+                        }
+                    }
+                    catch(Exception ex)
                     {
-                        RadioButton CS2myRadioButton = (RadioButton)(this.Controls["groupBox_DataTRansfer"]).Controls["radioButton_SPI_CS2"];
-                        //retval[1] |= (CS2myRadioButton.Checked ? (byte)0x04 : (byte)0x00);
+
                     }
 
                     break;
