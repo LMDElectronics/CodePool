@@ -58,6 +58,19 @@ typedef enum
 }TI2C_ClkSpeed;
 
 /**
+ * @ I2C returned data from physical driver events
+ */
+typedef struct
+{
+	UINT8 i2cPort;
+	UINT8 *dataBuffer;
+
+}I2CReturnData;
+
+typedef void (*OnWrite)(I2CReturnData);
+typedef void (*OnRead)(I2CReturnData);
+
+/**
  * @ config struct for Logical slave bus I2C driver
  */
 typedef struct
@@ -65,6 +78,10 @@ typedef struct
 	UINT8 				PortNumber;	/**<Physical i2c bus number >*/
 	TI2C_ClkSpeed	busSpeed;	/**<Physical i2c bus speed >*/
 	UINT32				I2CTimeout;	/**<Physical i2c timout to wait for response from slave>*/
+
+	//callbacks from physical I2C driver
+	OnWrite OnI2CWrite;
+	OnRead	OnI2CRead;
 
 }TLogicI2cConfig;
 
