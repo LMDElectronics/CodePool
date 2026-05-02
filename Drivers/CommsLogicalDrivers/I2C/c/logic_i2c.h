@@ -1,18 +1,18 @@
 #ifndef LOGIC_I2C_DRV
 #define LOGIC_I2C_DRV
 
-#include "C:\Users\MAX PC\Documents\repositories\CodePool\Common\MCU\typedef.h"
+#include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\Defs_i2c.h"
 
 //Low level functions to be implemented in physical driver
-extern UINT8 i2c_Config(UINT8 i2cPort, UINT8 clkSpeed, UINT32 timeout);
-extern UINT8 i2c_Init(UINT8 i2cPort);
-extern UINT8 i2c_Stop(UINT8 i2cPort);
+/*extern UINT8 I2C_Config(TI2cConfigHandler *i2cConfigHandler);
+extern UINT8 I2C_Init(UINT8 i2cPort);
+extern UINT8 I2C_Stop(UINT8 i2cPort);
 
-extern UINT8 i2c_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8 Count);
-extern UINT8 i2c_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8 Count);
+extern UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8 Count);
+extern UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8 Count);
 
-extern UINT8 i2c_SendRestart(UINT8 i2cPort);
-extern UINT8 i2c_BusyCheck(UINT8 i2cPort);
+extern UINT8 I2C_SendRestart(UINT8 i2cPort);
+extern UINT8 I2C_BusyCheck(UINT8 i2cPort);*/
 
 //max number of i2c independent ports to be controlled
 #define MAX_DEF_PORTS 8
@@ -45,53 +45,12 @@ typedef enum
 }TI2C_Status;
 
 /**
- * @ I2C clock speed selection
- */
-typedef enum
-{
-	I2C_CLK_100_KHZ,
-	I2C_CLK_400_KHZ,
-	I2C_CLK_1_MHZ,
-	I2C_CLK_3M4_MHZ,
-	I2C_CLK_5_MHZ
-
-}TI2C_ClkSpeed;
-
-/**
- * @ I2C returned data from physical driver events
- */
-typedef struct
-{
-	UINT8 i2cPort;
-	UINT8 *dataBuffer;
-
-}I2CReturnData;
-
-typedef void (*OnWrite)(I2CReturnData);
-typedef void (*OnRead)(I2CReturnData);
-
-/**
- * @ config struct for Logical slave bus I2C driver
- */
-typedef struct
-{
-	UINT8 				PortNumber;	/**<Physical i2c bus number >*/
-	TI2C_ClkSpeed	busSpeed;	/**<Physical i2c bus speed >*/
-	UINT32				I2CTimeout;	/**<Physical i2c timout to wait for response from slave>*/
-
-	//callbacks from physical I2C driver
-	OnWrite OnI2CWrite;
-	OnRead	OnI2CRead;
-
-}TLogicI2cConfig;
-
-/**
  * @brief Configure physical I2c bus
  * @param[in] TLogicI2cConfig, config handler to be set up in I2C bus
  * @return TI2C_Status
  */
 //*****************************************************************************
-TI2C_Status Logical_I2C_Config(TLogicI2cConfig *Logical_I2C_Config_Handler);
+TI2C_Status Logical_I2C_Config(TI2cConfigHandler *I2C_Config_Handler);
 //*****************************************************************************
 
 /**

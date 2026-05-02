@@ -1,19 +1,55 @@
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Common\MCU\global_def.h"
 #include "logic_i2c.h"
+#include "physical_i2c.h"
 
-//
-TLogicI2cConfig Logical_I2C_Port_Config_Handler[MAX_DEF_PORTS];
 TI2C_Status I2CPortStatus[MAX_DEF_PORTS];
 
 //*****************************************************************************
-TI2C_Status Logical_I2C_PortInit(UINT8 i2cPort)
+// Event Callbacks
+//*****************************************************************************
+
+//*****************************************************************************
+void DoOnI2CEventWrite(I2CReturnData data)
 //*****************************************************************************
 //
 //*****************************************************************************
 {
-	if(i2cPort <= MAX_DEF_PORTS)
+	int i=0;
+
+	i=0;
+}
+
+//*****************************************************************************
+//void DoOnI2CEventRead(I2CReturnData data)
+//*****************************************************************************
+//
+//*****************************************************************************
+//{
+
+
+//}
+
+//*****************************************************************************
+//void DoOnI2CEventError(I2CReturnData data)
+//*****************************************************************************
+//
+//*****************************************************************************
+//{
+
+
+//}
+
+
+
+//*****************************************************************************
+TI2C_Status Logical_I2C_Start(UINT8 i2cPort)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	if( i2cPort <= MAX_DEF_PORTS)
 	{
-		if(i2c_Init(i2cPort) != ERROR)
+		if( I2C_Start(i2cPort) != ERROR)
 		{
 			return I2CPortStatus[i2cPort] = I2C_PORT_INITIALIZED;
 		}
@@ -36,7 +72,7 @@ TI2C_Status Logical_I2C_Stop(UINT8 i2cPort)
 {
 	if(i2cPort <= MAX_DEF_PORTS)
 	{
-		if(i2c_Stop(i2cPort) != ERROR)
+		if( I2C_Stop(i2cPort) != ERROR)
 		{
 			return I2CPortStatus[i2cPort] = I2C_PORT_STOP;
 		}
@@ -52,28 +88,30 @@ TI2C_Status Logical_I2C_Stop(UINT8 i2cPort)
 }
 
 //*****************************************************************************
-TI2C_Status Logical_I2C_PortConfig(UINT8 i2cPort, TLogicI2cConfig Logical_I2C_Config_Handler[])
+TI2C_Status Logical_I2C_Config(TI2cConfigHandler *I2C_Config_Handler)
 //*****************************************************************************
 //
 //*****************************************************************************
 {
-	if(i2cPort <= MAX_DEF_PORTS)
+
+	//wiring callbacks
+	I2C_Config_Handler->OnI2CWrite = DoOnI2CEventWrite;
+
+	if(I2C_Config_Handler->PortNumber <= MAX_DEF_PORTS)
 	{
 		//Configuring the port
-		if( i2c_Config(	Logical_I2C_Port_Config_Handler[i2cPort].PortNumber,
-												Logical_I2C_Port_Config_Handler[i2cPort].busSpeed,
-												Logical_I2C_Port_Config_Handler[i2cPort].I2CTimeout) != ERROR)
+		if( I2C_Config(	I2C_Config_Handler) != ERROR)
 		{
-			return I2CPortStatus[i2cPort] = I2C_PORT_CONFIGURED;
+			return I2CPortStatus[I2C_Config_Handler->PortNumber] = I2C_PORT_CONFIGURED;
 		}
 		else
 		{
-			return I2CPortStatus[i2cPort] = I2C_ERROR_CONFIG_OPERATION;
+			return I2CPortStatus[I2C_Config_Handler->PortNumber] = I2C_ERROR_CONFIG_OPERATION;
 		}
 	}
 	else
 	{
-		return I2CPortStatus[i2cPort] = I2C_UNREACHABLE_BUS;
+		return I2CPortStatus[I2C_Config_Handler->PortNumber] = I2C_UNREACHABLE_BUS;
 	}
 }
 
@@ -85,7 +123,7 @@ TI2C_Status Logical_I2C_Restart(UINT8 i2cPort)
 {
 	if(i2cPort <= MAX_DEF_PORTS)
 	{
-		if(i2c_SendRestart(i2cPort) != ERROR)
+		if( I2C_SendRestart(i2cPort) != ERROR)
 		{
 			return I2CPortStatus[i2cPort] = I2C_LAST_TRANSACTION_OK;
 		}
@@ -110,7 +148,7 @@ TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UI
 
 	if(i2cPort <= MAX_DEF_PORTS)
 	{
-		opstatus = i2c_WriteData(i2cPort, deviceAddr, reg, dataBuff, count);
+		opstatus = I2C_WriteData(i2cPort, deviceAddr, reg, dataBuff, count);
 
 		switch (opstatus)
 		{
@@ -136,7 +174,7 @@ TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UIN
 
 	if(i2cPort <= MAX_DEF_PORTS)
 	{
-		opstatus = i2c_ReadData(i2cPort, deviceAddr, reg, dataBuff, count);
+		opstatus = I2C_ReadData(i2cPort, deviceAddr, reg, dataBuff, count);
 
 		switch (opstatus)
 		{
@@ -150,20 +188,6 @@ TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UIN
 	{
 		return I2CPortStatus[i2cPort] = I2C_UNREACHABLE_BUS;
 	}
-}
-
-//*****************************************************************************
-// Event Callbacks
-//*****************************************************************************
-
-//*****************************************************************************
-void DoOnI2CEventWrite(UINT8 i2cPort, UINT8 *dataBuffer)
-//*****************************************************************************
-//
-//*****************************************************************************
-{
-
-
 }
 
 
