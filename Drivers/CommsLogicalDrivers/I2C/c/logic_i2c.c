@@ -1,6 +1,6 @@
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Common\MCU\global_def.h"
 #include "logic_i2c.h"
-#include "physical_i2c.h"
+#include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\MCU\KL82Z128\physical_i2c.h"
 
 TI2C_Status I2CPortStatus[MAX_DEF_PORTS];
 
@@ -14,9 +14,7 @@ void DoOnI2CEventWrite(I2CReturnData data)
 //
 //*****************************************************************************
 {
-	int i=0;
 
-	i=0;
 }
 
 //*****************************************************************************
