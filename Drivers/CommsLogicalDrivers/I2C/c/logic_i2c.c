@@ -2,42 +2,17 @@
 #include "logic_i2c.h"
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\MCU\KL82Z128\physical_i2c.h"
 
+//callbacks for event
+void DoOn_I2C_Physical_Event_Write(UINT8 port, UINT8 *dataBuffer, UINT8 count);
+void DoOn_I2C_Physical_Event_Read(UINT8 port, UINT8 *dataBuffer, UINT8 count);
+void DoOn_I2C_Physical_Event_Error(UINT8 port, UINT8 error);
+
+//events to be launched to app
+OnWriteI2C OnI2cWriteData;
+OnWriteI2C OnI2cReadData;
+OnWriteI2C OnI2cError;
+
 TI2C_Status I2CPortStatus[MAX_DEF_PORTS];
-
-//*****************************************************************************
-// Event Callbacks
-//*****************************************************************************
-
-//*****************************************************************************
-void DoOnI2CEventWrite(I2CReturnData data)
-//*****************************************************************************
-//
-//*****************************************************************************
-{
-
-}
-
-//*****************************************************************************
-//void DoOnI2CEventRead(I2CReturnData data)
-//*****************************************************************************
-//
-//*****************************************************************************
-//{
-
-
-//}
-
-//*****************************************************************************
-//void DoOnI2CEventError(I2CReturnData data)
-//*****************************************************************************
-//
-//*****************************************************************************
-//{
-
-
-//}
-
-
 
 //*****************************************************************************
 TI2C_Status Logical_I2C_Start(UINT8 i2cPort)
@@ -86,19 +61,25 @@ TI2C_Status Logical_I2C_Stop(UINT8 i2cPort)
 }
 
 //*****************************************************************************
-TI2C_Status Logical_I2C_Config(TI2cConfigHandler *I2C_Config_Handler)
+TI2C_Status Logical_I2C_Config(TI2cLogicConfigHandler *I2C_Config_Handler)
 //*****************************************************************************
 //
 //*****************************************************************************
 {
+	TI2cPhysicalConfigHandler I2c_Phy_Config_Handler;
 
-	//wiring callbacks
-	I2C_Config_Handler->OnI2CWrite = DoOnI2CEventWrite;
+	//prepare config data for physical driver
+	I2c_Phy_Config_Handler.PortNumber = I2C_Config_Handler->PortNumber;
+	I2c_Phy_Config_Handler.busSpeed = I2C_Config_Handler->busSpeed;
+	I2c_Phy_Config_Handler.I2CTimeout = I2C_Config_Handler->I2CTimeout;
+
+	//wiring callbacks from physical event to logic callback
+	Set_OnPhysical_I2C_Write_Callback(DoOn_I2C_Physical_Event_Write);
 
 	if(I2C_Config_Handler->PortNumber <= MAX_DEF_PORTS)
 	{
 		//Configuring the port
-		if( I2C_Config(	I2C_Config_Handler) != ERROR)
+		if( I2C_Config(	&I2c_Phy_Config_Handler) != ERROR)
 		{
 			return I2CPortStatus[I2C_Config_Handler->PortNumber] = I2C_PORT_CONFIGURED;
 		}
@@ -188,4 +169,86 @@ TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UIN
 	}
 }
 
+//*****************************************************************************
+// Callback setup
+//*****************************************************************************
+
+//*****************************************************************************
+void Set_OnLogical_I2C_Write_Callback(OnWriteI2C function)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	OnI2cWriteData = function;
+}
+
+//*****************************************************************************
+void Set_OnLogical_I2C_Read_Callback(OnReadI2C function)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	OnI2cReadData = function;
+}
+
+//*****************************************************************************
+void Set_OnLogical_I2C_Error_Callback(OnErrorI2C function)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	OnI2cError = function;
+}
+
+//*****************************************************************************
+// Event Callbacks
+//*****************************************************************************
+
+//*****************************************************************************
+void DoOn_I2C_Physical_Event_Write(UINT8 port, UINT8 *dataBuffer, UINT8 count)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	I2CLogicalReturnData data;
+
+	data.dataBuff = dataBuffer;
+	data.port = port;
+	data.count = count;
+	data.error = 0;
+
+	if(OnI2cWriteData) OnI2cWriteData(data);
+}
+
+//*****************************************************************************
+void DoOn_I2C_Physical_Event_Read(UINT8 port, UINT8 *dataBuffer, UINT8 count)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	I2CLogicalReturnData data;
+
+	data.dataBuff = dataBuffer;
+	data.port = port;
+	data.count = count;
+	data.error = 0;
+
+	OnI2cReadData(data);
+}
+
+//*****************************************************************************
+void DoOn_I2C_Physical_Event_Error(UINT8 port, UINT8 error)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	I2CLogicalReturnData data;
+
+	data.dataBuff = NULL;
+	data.port = port;
+	data.count = 0;
+	data.error = error;
+
+	OnI2cError(data);
+}
 

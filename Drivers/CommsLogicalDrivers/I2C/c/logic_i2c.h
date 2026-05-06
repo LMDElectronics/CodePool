@@ -3,17 +3,6 @@
 
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\Defs_i2c.h"
 
-//Low level functions to be implemented in physical driver
-/*extern UINT8 I2C_Config(TI2cConfigHandler *i2cConfigHandler);
-extern UINT8 I2C_Init(UINT8 i2cPort);
-extern UINT8 I2C_Stop(UINT8 i2cPort);
-
-extern UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8 Count);
-extern UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8 Count);
-
-extern UINT8 I2C_SendRestart(UINT8 i2cPort);
-extern UINT8 I2C_BusyCheck(UINT8 i2cPort);*/
-
 //max number of i2c independent ports to be controlled
 #define MAX_DEF_PORTS 8
 
@@ -45,12 +34,39 @@ typedef enum
 }TI2C_Status;
 
 /**
- * @brief Configure physical I2c bus
+ * @ config struct for Logical slave bus I2C driver
+ */
+typedef struct
+{
+	UINT8 				PortNumber;	/**<Physical i2c bus number >*/
+	UINT16				busSpeed;	/**<Physical i2c bus speed >*/
+	UINT32				I2CTimeout;	/**<Physical i2c timout to wait for response from slave>*/
+
+}TI2cLogicConfigHandler;
+
+typedef struct
+{
+	UINT8 port;
+	UINT8 *dataBuff;
+	UINT8 count;
+	UINT8 error;
+
+}I2CLogicalReturnData;
+
+/**
+ * @ I2C Logical Bus events
+ */
+typedef void (*OnWriteI2C)(I2CLogicalReturnData);
+typedef void (*OnReadI2C)(I2CLogicalReturnData);
+typedef void (*OnErrorI2C)(I2CLogicalReturnData);
+
+/**
+ * @brief Configure I2c bus
  * @param[in] TLogicI2cConfig, config handler to be set up in I2C bus
  * @return TI2C_Status
  */
 //*****************************************************************************
-TI2C_Status Logical_I2C_Config(TI2cConfigHandler *I2C_Config_Handler);
+TI2C_Status Logical_I2C_Config(TI2cLogicConfigHandler *I2C_Config_Handler);
 //*****************************************************************************
 
 /**
@@ -100,6 +116,10 @@ TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UI
  */
 //*****************************************************************************
 TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UINT8 *dataBuff, UINT8 count);
+
+void Set_OnLogical_I2C_Write_Callback(OnWriteI2C function);
+void Set_OnLogical_I2C_Read_Callback(OnReadI2C function);
+void Set_OnLogical_I2C_Error_Callback(OnErrorI2C function);
 
 #endif
 
