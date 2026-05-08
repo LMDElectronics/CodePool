@@ -33,17 +33,6 @@ typedef enum
 	I2C_UNREACHABLE_BUS
 }TI2C_Status;
 
-/**
- * @ config struct for Logical slave bus I2C driver
- */
-typedef struct
-{
-	UINT8 				PortNumber;	/**<Physical i2c bus number >*/
-	UINT16				busSpeed;	/**<Physical i2c bus speed >*/
-	UINT32				I2CTimeout;	/**<Physical i2c timout to wait for response from slave>*/
-
-}TI2cLogicConfigHandler;
-
 typedef struct
 {
 	UINT8 port;
@@ -59,6 +48,21 @@ typedef struct
 typedef void (*OnWriteI2C)(I2CLogicalReturnData);
 typedef void (*OnReadI2C)(I2CLogicalReturnData);
 typedef void (*OnErrorI2C)(I2CLogicalReturnData);
+
+/**
+ * @ config struct for Logical slave bus I2C driver
+ */
+typedef struct
+{
+	UINT8 			PortNumber;	/**<Physical i2c bus number >*/
+	UINT16			busSpeed;	/**<Physical i2c bus speed >*/
+	UINT32			I2CTimeout;	/**<Physical i2c timout to wait for response from slave>*/
+
+	OnWriteI2C	WriteI2C_Callback;
+	OnReadI2C		ReadI2C_Callback;
+	OnErrorI2C	ErrorI2C_Callback;
+
+}TI2cLogicConfigHandler;
 
 /**
  * @brief Configure I2c bus
@@ -116,10 +120,6 @@ TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UI
  */
 //*****************************************************************************
 TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UINT8 *dataBuff, UINT8 count);
-
-void Set_OnLogical_I2C_Write_Callback(OnWriteI2C function);
-void Set_OnLogical_I2C_Read_Callback(OnReadI2C function);
-void Set_OnLogical_I2C_Error_Callback(OnErrorI2C function);
 
 #endif
 

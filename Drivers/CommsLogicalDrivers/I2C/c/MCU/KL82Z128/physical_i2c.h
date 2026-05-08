@@ -11,17 +11,6 @@
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\Defs_i2c.h"
 
 /**
- * @ config struct for Logical slave bus I2C driver
- */
-typedef struct
-{
-	UINT8 				PortNumber;	/**<Physical i2c bus number >*/
-	UINT16				busSpeed;	/**<Physical i2c bus speed >*/
-	UINT32				I2CTimeout;	/**<Physical i2c timout to wait for response from slave>*/
-
-}TI2cPhysicalConfigHandler;
-
-/**
  * @ I2C returned data from physical driver events
  */
 typedef struct
@@ -41,11 +30,19 @@ typedef void (*OnRead)(UINT8 Port, UINT8 *dataBuffer, UINT8 count);
 typedef void (*OnError)(UINT8 Port, UINT8 error);
 
 /**
- * @ I2C funtions to setup the upper layer callback
+ * @ config struct for Logical slave bus I2C driver
  */
-void Set_OnPhysical_I2C_Write_Callback(OnWrite function);
-void Set_OnPhysical_I2C_Read_Callback(OnRead function);
-void Set_OnPhysical_I2C_Error_Callback(OnError function);
+typedef struct
+{
+	UINT8 				PortNumber;	/**<Physical i2c bus number >*/
+	UINT16				busSpeed;	/**<Physical i2c bus speed >*/
+	UINT32				I2CTimeout;	/**<Physical i2c timout to wait for response from slave>*/
+
+	OnWrite	callbackWriteI2c;
+	OnRead 	callbackReadI2c;
+	OnError callbackErrorI2c;
+
+}TI2cPhysicalConfigHandler;
 
 UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler);
 UINT8 I2C_Start(UINT8 i2cPort);

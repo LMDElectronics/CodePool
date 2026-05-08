@@ -43,21 +43,11 @@ void SaveI2CPhysicalDriverConfig(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 	PhysicalDriverConfigHandler.PortNumber = I2C_Config_Handler->PortNumber;
 	PhysicalDriverConfigHandler.busSpeed = I2C_Config_Handler->busSpeed;
 	PhysicalDriverConfigHandler.I2CTimeout = I2C_Config_Handler->I2CTimeout;
-}
 
-void Set_OnPhysical_I2C_Write_Callback(OnWrite function)
-{
-	OnEvent_I2CWrite = function;
-}
-
-void Set_OnPhysical_I2C_Read_Callback(OnRead function)
-{
-	OnEvent_I2CRead = function;
-}
-
-void Set_OnPhysical_I2C_Error_Callback(OnError function)
-{
-	OnEvent_I2CError = function;
+	//wiring events to callbacks from logical driver
+	OnEvent_I2CWrite = I2C_Config_Handler->callbackWriteI2c;
+	OnEvent_I2CRead = I2C_Config_Handler->callbackReadI2c;
+	OnEvent_I2CError = I2C_Config_Handler->callbackErrorI2c;
 }
 
 //*****************************************************************************
@@ -80,6 +70,8 @@ UINT8 I2C_Start(UINT8 i2cPort)
 
 	//test
 	if(OnEvent_I2CWrite) OnEvent_I2CWrite(0, dataBuff, 10);
+	if(OnEvent_I2CRead) OnEvent_I2CRead(0, dataBuff, 10);
+	if(OnEvent_I2CError) OnEvent_I2CError(0, 0xaa);
 
 	return OK;
 }

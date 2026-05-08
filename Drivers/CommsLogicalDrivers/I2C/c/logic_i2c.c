@@ -73,8 +73,14 @@ TI2C_Status Logical_I2C_Config(TI2cLogicConfigHandler *I2C_Config_Handler)
 	I2c_Phy_Config_Handler.busSpeed = I2C_Config_Handler->busSpeed;
 	I2c_Phy_Config_Handler.I2CTimeout = I2C_Config_Handler->I2CTimeout;
 
-	//wiring callbacks from physical event to logic callback
-	Set_OnPhysical_I2C_Write_Callback(DoOn_I2C_Physical_Event_Write);
+	I2c_Phy_Config_Handler.callbackWriteI2c = DoOn_I2C_Physical_Event_Write;
+	I2c_Phy_Config_Handler.callbackReadI2c = DoOn_I2C_Physical_Event_Read;
+	I2c_Phy_Config_Handler.callbackErrorI2c = DoOn_I2C_Physical_Event_Error;
+
+	//wiring events to callbacks from app layer
+	OnI2cWriteData 	= I2C_Config_Handler->WriteI2C_Callback;
+	OnI2cReadData 	= I2C_Config_Handler->ReadI2C_Callback;
+	OnI2cError 			= I2C_Config_Handler->ErrorI2C_Callback;
 
 	if(I2C_Config_Handler->PortNumber <= MAX_DEF_PORTS)
 	{
@@ -167,37 +173,6 @@ TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UIN
 	{
 		return I2CPortStatus[i2cPort] = I2C_UNREACHABLE_BUS;
 	}
-}
-
-//*****************************************************************************
-// Callback setup
-//*****************************************************************************
-
-//*****************************************************************************
-void Set_OnLogical_I2C_Write_Callback(OnWriteI2C function)
-//*****************************************************************************
-//
-//*****************************************************************************
-{
-	OnI2cWriteData = function;
-}
-
-//*****************************************************************************
-void Set_OnLogical_I2C_Read_Callback(OnReadI2C function)
-//*****************************************************************************
-//
-//*****************************************************************************
-{
-	OnI2cReadData = function;
-}
-
-//*****************************************************************************
-void Set_OnLogical_I2C_Error_Callback(OnErrorI2C function)
-//*****************************************************************************
-//
-//*****************************************************************************
-{
-	OnI2cError = function;
 }
 
 //*****************************************************************************
