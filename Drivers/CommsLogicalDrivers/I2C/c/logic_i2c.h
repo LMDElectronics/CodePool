@@ -1,7 +1,7 @@
 #ifndef LOGIC_I2C_DRV
 #define LOGIC_I2C_DRV
 
-#include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\Defs_i2c.h"
+#include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\Defs_I2c.h"
 
 //max number of i2c independent ports to be controlled
 #define MAX_DEF_PORTS 8
@@ -48,6 +48,7 @@ typedef struct
 typedef void (*OnWriteI2C)(I2CLogicalReturnData);
 typedef void (*OnReadI2C)(I2CLogicalReturnData);
 typedef void (*OnErrorI2C)(I2CLogicalReturnData);
+typedef void (*OnFeaturesRecv)(TI2CMCUFeatures);
 
 /**
  * @ config struct for Logical slave bus I2C driver
@@ -58,14 +59,22 @@ typedef struct
 	UINT16	busSpeed;								/**<Physical i2c bus speed >*/
 	UINT8		slave10AddressBitsOn; 	/**<Physical i2c bits used for slave address>*/
 	UINT16	I2CTimeout;							/**<Physical i2c timout to wait for response from slave>*/
-
+	UINT8		mastermode;							/**<Physical i2c port mode>*/
 	UINT8		pinoutLocation;					/**<Physical i2c location for i2c pinout ios (for mcu supporting multiple peripheral pinouts)> */
 
-	OnWriteI2C	WriteI2C_Callback;
-	OnReadI2C		ReadI2C_Callback;
-	OnErrorI2C	ErrorI2C_Callback;
+	OnWriteI2C			WriteI2C_Callback;
+	OnReadI2C				ReadI2C_Callback;
+	OnErrorI2C			ErrorI2C_Callback;
 
 }TI2cLogicConfigHandler;
+
+/**
+ * @brief Ask for I2C driver features
+ * @return TI2CMCUFeatures features data
+ */
+//*****************************************************************************
+TI2CMCUFeatures *Logical_I2C_Features(void);
+//*****************************************************************************
 
 /**
  * @brief Configure I2c bus

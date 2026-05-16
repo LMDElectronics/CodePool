@@ -12,11 +12,14 @@
 #include "MKL82Z7.h"
 
 //I2c physical driver events
-OnWrite OnEvent_I2CWrite;
-OnRead OnEvent_I2CRead;
-OnError OnEvent_I2CError;
+OnWrite 		OnEvent_I2CWrite;
+OnRead 			OnEvent_I2CRead;
+OnError 		OnEvent_I2CError;
 
-TI2CPeripheralFeatures i2cPhysicalDriverFeatures;
+//pointer to describe the num of i2c ports and its pinout alternatives, [section 11.3.1, KL82P121M72SF0RM.pdf]
+UINT8 portsAndPinoutAlt[2][I2C_PINOUT_ALTERNATIVE_POSITIONS];
+
+TI2CMCUFeatures i2cPhysicalDriverFeatures;
 TI2cPhysicalConfigHandler PhysicalDriverConfigHandler; //config handler for i2c module
 
 //*****************************************************************************
@@ -25,6 +28,8 @@ UINT8 I2C0_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 // MCU dependant function: I2C config pinout location
 //*****************************************************************************
 {
+	//section
+
 	//configuring i2c signals pinout
 	switch(pinoutLocation)
 	{
@@ -196,16 +201,43 @@ void SaveI2CPhysicalDriverConfig(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 //*****************************************************************************
 
 //*****************************************************************************
-TI2CPeripheralFeatures I2C_AskPeripheralFeatures(void)
+TI2CMCUFeatures *I2C_AskPeripheralFeatures(void)
 //*****************************************************************************
-//
+// MCU i2c peripheral features
 //*****************************************************************************
 {
-	i2cPhysicalDriverFeatures |= tfi2c_multimaster;
-	i2cPhysicalDriverFeatures |= tfi2c_masterAndSlave;
-	i2cPhysicalDriverFeatures |= tfi2c_MultiplePinoutLocation;
+	UINT8 j=0;
 
-	return i2cPhysicalDriverFeatures;
+	//physical how many I2C ports the physical driver manages according to I2C HW
+	i2cPhysicalDriverFeatures.numOfPhysicalPorts = 2;
+
+	//define I2C pinout posible locations and fill the other ones with none alternative
+	i2cPhysicalDriverFeatures.pinoutAltsPerPort = portsAndPinoutAlt;
+
+	portsAndPinoutAlt[0][0] = pinoutLocation_Alt2;
+	portsAndPinoutAlt[0][1] = pinoutLocation_Alt7;
+	for(j=2; j<I2C_PINOUT_ALTERNATIVE_POSITIONS; j++)
+	{
+		portsAndPinoutAlt[0][j] = pinoutLocation_none;
+	}
+
+	portsAndPinoutAlt[1][0]= pinoutLocation_Alt2;
+	portsAndPinoutAlt[1][1]= pinoutLocation_Alt6;
+	for(j=2; j<I2C_PINOUT_ALTERNATIVE_POSITIONS; j++)
+	{
+		portsAndPinoutAlt[1][j] = pinoutLocation_none;
+	}
+
+	//device has master mode feature
+	i2cPhysicalDriverFeatures.masterModeFeature = TRUE;
+
+	//device has 10bits slave address feature
+	i2cPhysicalDriverFeatures.slave10AddressBitFeature = TRUE;
+
+	//device has DMA I2C transfers feature
+	i2cPhysicalDriverFeatures.DMAI2CTransfersfeature = TRUE;
+
+	return &i2cPhysicalDriverFeatures;
 }
 
 //*****************************************************************************

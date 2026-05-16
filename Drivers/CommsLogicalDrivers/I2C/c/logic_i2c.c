@@ -1,5 +1,8 @@
+
+
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Common\MCU\global_def.h"
 #include "logic_i2c.h"
+
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\MCU\KL82Z128\physical_i2c.h"
 
 //callbacks for event
@@ -8,9 +11,9 @@ void DoOn_I2C_Physical_Event_Read(UINT8 port, UINT8 *dataBuffer, UINT8 count);
 void DoOn_I2C_Physical_Event_Error(UINT8 port, UINT8 error);
 
 //events to be launched to app
-OnWriteI2C OnI2cWriteData;
-OnWriteI2C OnI2cReadData;
-OnWriteI2C OnI2cError;
+OnWriteI2C 		OnI2cWriteData;
+OnReadI2C 		OnI2cReadData;
+OnErrorI2C 		OnI2cError;
 
 TI2C_Status I2CPortStatus[MAX_DEF_PORTS];
 
@@ -61,15 +64,20 @@ TI2C_Status Logical_I2C_Stop(UINT8 i2cPort)
 }
 
 //*****************************************************************************
+TI2CMCUFeatures *Logical_I2C_Features(void)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	return I2C_AskPeripheralFeatures();
+}
+
+//*****************************************************************************
 TI2C_Status Logical_I2C_Config(TI2cLogicConfigHandler *I2C_Config_Handler)
 //*****************************************************************************
 //
 //*****************************************************************************
 {
-	TI2CPeripheralFeatures i2cPhyfeatures;
-
-	i2cPhyfeatures = I2C_AskPeripheralFeatures();
-
 	TI2cPhysicalConfigHandler I2c_Phy_Config_Handler;
 
 	//prepare config data for physical driver
@@ -232,4 +240,3 @@ void DoOn_I2C_Physical_Event_Error(UINT8 port, UINT8 error)
 
 	OnI2cError(data);
 }
-
