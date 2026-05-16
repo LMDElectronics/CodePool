@@ -25,18 +25,21 @@ typedef struct
 /**
  * @ I2C events
  */
-typedef void (*OnWrite)(UINT8 Port, UINT8 *dataBuffer, UINT8 count);
-typedef void (*OnRead)(UINT8 Port, UINT8 *dataBuffer, UINT8 count);
-typedef void (*OnError)(UINT8 Port, UINT8 error);
+typedef void (*OnWrite)(UINT8 port, UINT8 *dataBuffer, UINT8 count);
+typedef void (*OnRead)(UINT8 port, UINT8 *dataBuffer, UINT8 count);
+typedef void (*OnError)(UINT8 port, UINT8 error);
 
 /**
  * @ config struct for Logical slave bus I2C driver
  */
 typedef struct
 {
-	UINT8 				PortNumber;	/**<Physical i2c bus number >*/
-	UINT16				busSpeed;	/**<Physical i2c bus speed >*/
-	UINT32				I2CTimeout;	/**<Physical i2c timout to wait for response from slave>*/
+	UINT8 	portNumber;						/**<Physical i2c bus number >*/
+	UINT16	busSpeed;							/**<Physical i2c bus speed >*/
+	UINT8		masterModeOn;					/**<Physical i2c master mode or slave mode>*/
+	UINT8		slave10AddressBitsOn;	/**<Physical i2c bits used for slave address>*/
+	UINT16	I2CTimeout;						/**<Physical i2c timout to wait for response from slave>*/
+	UINT8		pinoutLocation;				/**<Physical i2c location for i2c pinout ios (for mcu supporting multiple peripheral pinouts)> */
 
 	OnWrite	callbackWriteI2c;
 	OnRead 	callbackReadI2c;
@@ -44,6 +47,43 @@ typedef struct
 
 }TI2cPhysicalConfigHandler;
 
+/**
+ * @ Enums for multiple i2c0 pinout location [section 11.3.1, KL82P121M72SF0RM.pdf]
+ */
+typedef enum
+{
+	pinoutLocation_Alt2,		//Alt2 		-> [PTB0, SCL],[PTB1, SDA]
+	pinoutLocation_Alt7,		//Alt 7 	-> [PTD2, SCL],[PTD3, SDA]
+
+}TI2C0PinoutLocation;
+
+/**
+ * @ Enums for multiple i2c1 pinout location [section 11.3.1, KL82P121M72SF0RM.pdf]
+ */
+typedef enum
+{
+	pinoutLocation_Alt6,	//Alt 6 -> [PTE0, SDA],[PTE1, SCL]
+	pinoutLocation_Alt2		//Alt 2 -> [PTC10, SCL],[PTC11, SDA]
+
+}TI2C1PinoutLocation;
+
+/**
+ * @ Enums for physical i2c driver features
+ */
+typedef enum
+{
+	tfi2c_multimaster,
+	tfi2c_masterAndSlave,
+	tfi2c_10bitAdresses,
+	tfi2c_lowPowerMode,
+	tfi2c_DMASupport,
+	tfi2c_MultiplePinoutLocation,
+	//...
+	feature31
+
+}TI2CPeripheralFeatures;
+
+TI2CPeripheralFeatures I2C_AskPeripheralFeatures(void);
 UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler);
 UINT8 I2C_Start(UINT8 i2cPort);
 UINT8 I2C_Stop(UINT8 i2cPort);

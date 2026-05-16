@@ -54,9 +54,12 @@ typedef void (*OnErrorI2C)(I2CLogicalReturnData);
  */
 typedef struct
 {
-	UINT8 			PortNumber;	/**<Physical i2c bus number >*/
-	UINT16			busSpeed;	/**<Physical i2c bus speed >*/
-	UINT32			I2CTimeout;	/**<Physical i2c timout to wait for response from slave>*/
+	UINT8		portNumber;							/**<Physical i2c bus number >*/
+	UINT16	busSpeed;								/**<Physical i2c bus speed >*/
+	UINT8		slave10AddressBitsOn; 	/**<Physical i2c bits used for slave address>*/
+	UINT16	I2CTimeout;							/**<Physical i2c timout to wait for response from slave>*/
+
+	UINT8		pinoutLocation;					/**<Physical i2c location for i2c pinout ios (for mcu supporting multiple peripheral pinouts)> */
 
 	OnWriteI2C	WriteI2C_Callback;
 	OnReadI2C		ReadI2C_Callback;
@@ -108,6 +111,7 @@ TI2C_Status Logical_I2C_Restart(UINT8 i2cPort);
  */
 //*****************************************************************************
 TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UINT8 *dataBuff, UINT8 count);
+//*****************************************************************************
 
 /**
  * @brief write byte
@@ -120,6 +124,7 @@ TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UI
  */
 //*****************************************************************************
 TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 reg, UINT8 *dataBuff, UINT8 count);
+//*****************************************************************************
 
 #endif
 

@@ -3,8 +3,6 @@
 
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Common\MCU\typedef.h"
 
-
-
 /**
  * @ I2C clock speed selection
  */

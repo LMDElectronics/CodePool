@@ -16,4 +16,6 @@
 #define SINT16 signed short int
 #define SINT32 signed int
 
+#define BOOL bool;
+
 #endif /* TYPEDEF_H_ */

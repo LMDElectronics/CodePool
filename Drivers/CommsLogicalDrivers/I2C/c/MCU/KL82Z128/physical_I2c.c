@@ -3,29 +3,143 @@
  *
  *  Created on: 2 may 2026
  *      Author: MAX PC
+ *
+ *      for NXP MKL82Z128 VLK7 variant 80 pins device [Table 1 of KL82P121M72SF0.pdf]
  */
 
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Common\MCU\global_def.h"
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\MCU\KL82Z128\physical_i2c.h"
+#include "MKL82Z7.h"
 
+//I2c physical driver events
 OnWrite OnEvent_I2CWrite;
 OnRead OnEvent_I2CRead;
 OnError OnEvent_I2CError;
 
-TI2cPhysicalConfigHandler PhysicalDriverConfigHandler;
+TI2CPeripheralFeatures i2cPhysicalDriverFeatures;
+TI2cPhysicalConfigHandler PhysicalDriverConfigHandler; //config handler for i2c module
 
 //*****************************************************************************
-UINT8 I2C_Config_Port(UINT8 i2cPort)
+UINT8 I2C0_Config_PinoutLocation(TI2C0PinoutLocation pinoutLocation)
+//*****************************************************************************
+// MCU dependant function: I2C config pinout location
+//*****************************************************************************
+{
+	//configuring i2c signals pinout
+	switch(pinoutLocation)
+	{
+		default:
+		case pinoutLocation_Alt2:
+			//enable clock gate for i2c selected pinout port
+			SIM->SCGC5 |= 0x00000400;
+
+			//setup the corresponding selected pins for i2c signals
+	    /* PORTB0  I2C0_SCL*/
+			PORTB->PCR[0] = 0x00000200;
+	    /* PORTB1  I2C0_SDA*/
+			PORTB->PCR[1] = 0x00000200;
+			break;
+
+		case pinoutLocation_Alt7:
+			//enable clock gate for i2c selected pinout port
+			//setup the corresponding selected pins for i2c signals
+			break;
+	}
+}
+
+//*****************************************************************************
+UINT8 I2C1_Config_PinoutLocation(TI2C1PinoutLocation pinoutLocation)
+//*****************************************************************************
+// MCU dependant function: I2C config pinout location
+//*****************************************************************************
+{
+	//configuring i2c signals pinout
+	switch(pinoutLocation)
+	{
+		default:
+		case pinoutLocation_Alt6:
+			//enable clock gate for i2c1 selected pinout port [section 13.2.8, KL82P121M72SF0RM.pdf]
+			SIM->SCGC5 |= 0x00002000;
+
+			//setup the corresponding selected pins for i2c signals
+
+			break;
+
+		case pinoutLocation1_Alt2:
+			//enable clock gate for i2c1 selected pinout port
+			//setup the corresponding selected pins for i2c signals
+			break;
+	}
+}
+
+//*****************************************************************************
+UINT8 I2C_Config_port(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 //*****************************************************************************
 // MCU dependant function: I2C config port
 //*****************************************************************************
 {
-	//TODO
+	//configuring peripheral i2c
+	switch(I2C_Config_Handler->portNumber)
+	{
+		case 0:
+			//enable clock gate for i2c port 0 mcu peripheral [section 13.2.7, KL82P121M72SF0RM.pdf]
+			SIM->SCGC4 |= 0x00000040;
+
+			//[section 49.3.1, KL82P121M72SF0RM.pdf]
+			I2C0->C1 |= 0b01100000;
+
+			//[section 49.4.6, KL82P121M72SF0RM.pdf]
+			I2C0->C2 |= 0b00000000;
+
+			//set the pinout location
+			I2C0_Config_PinoutLocation(I2C_Config_Handler->pinoutLocation);
+			break;
+
+		case 1:
+			//enable clock gate for i2c port 1 mcu peripheral [section 13.2.7, KL82P121M72SF0RM.pdf]
+			SIM->SCGC4 |= 0x00000080;
+
+			//[section 49.3.1, KL82P121M72SF0RM.pdf]
+			I2C1->C1 |= 0b01100000;
+
+			//[section 49.4.6, KL82P121M72SF0RM.pdf]
+			I2C1->C2 |= 0b00000000;
+
+			//set the pinout location
+			I2C1_Config_PinoutLocation(I2C_Config_Handler->pinoutLocation);
+			break;
+
+		default:
+			return ERROR;
+			break;
+	}
+
 	return OK;
 }
 
 //*****************************************************************************
-UINT8 I2C_Config_Clk(UINT8 clkSpeed)
+UINT8 I2C_Config_Clk(TI2cPhysicalConfigHandler *I2C_Config_Handler)
+//*****************************************************************************
+// MCU dependant function: I2C config clk speed
+//*****************************************************************************
+{
+	switch(I2C_Config_Handler->portNumber)
+	{
+		case 0:
+			break;
+
+		case 1:
+			break;
+
+		default:
+			return ERROR;
+			break;
+	}
+	return OK;
+}
+
+//*****************************************************************************
+UINT8 I2C_Config_Timeout(UINT8 timeout)
 //*****************************************************************************
 // MCU dependant function: I2C config clk speed
 //*****************************************************************************
@@ -40,9 +154,10 @@ void SaveI2CPhysicalDriverConfig(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 //
 //*****************************************************************************
 {
-	PhysicalDriverConfigHandler.PortNumber = I2C_Config_Handler->PortNumber;
+	PhysicalDriverConfigHandler.portNumber = I2C_Config_Handler->portNumber;
 	PhysicalDriverConfigHandler.busSpeed = I2C_Config_Handler->busSpeed;
 	PhysicalDriverConfigHandler.I2CTimeout = I2C_Config_Handler->I2CTimeout;
+	PhysicalDriverConfigHandler.slave10AddressBitsOn = I2C_Config_Handler->slave10AddressBitsOn;
 
 	//wiring events to callbacks from logical driver
 	OnEvent_I2CWrite = I2C_Config_Handler->callbackWriteI2c;
@@ -51,8 +166,52 @@ void SaveI2CPhysicalDriverConfig(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 }
 
 //*****************************************************************************
-// Physical driver external functions implementation
+// Physical driver exposed external functions implementation
 //*****************************************************************************
+
+//*****************************************************************************
+TI2CPeripheralFeatures I2C_AskPeripheralFeatures(void)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	i2cPhysicalDriverFeatures |= tfi2c_multimaster;
+	i2cPhysicalDriverFeatures |= tfi2c_masterAndSlave;
+	i2cPhysicalDriverFeatures |= tfi2c_MultiplePinoutLocation;
+
+	return i2cPhysicalDriverFeatures;
+}
+
+//*****************************************************************************
+UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
+//*****************************************************************************
+//
+//*****************************************************************************
+{
+	//config port
+	if( I2C_Config_port(I2C_Config_Handler) == ERROR)
+	{
+		return ERROR;
+	}
+
+	//config CLK
+	if( I2C_Config_Clk(I2C_Config_Handler) == ERROR)
+	{
+		return ERROR;
+	}
+	else
+
+	//config timeout
+	if( I2C_Config_Timeout(I2C_Config_Handler->I2CTimeout) == ERROR)
+	{
+		return ERROR;
+	}
+
+	//saving current i2c config
+	SaveI2CPhysicalDriverConfig(I2C_Config_Handler);
+
+	return OK;
+}
 
 //*****************************************************************************
 UINT8 I2C_Start(UINT8 i2cPort)
@@ -60,6 +219,9 @@ UINT8 I2C_Start(UINT8 i2cPort)
 //
 //*****************************************************************************
 {
+	//
+
+	//test
 	UINT8 dataBuff[10];
 	UINT8 i=0;
 
@@ -68,41 +230,9 @@ UINT8 I2C_Start(UINT8 i2cPort)
 		dataBuff[i] = 0xAA;
 	}
 
-	//test
 	if(OnEvent_I2CWrite) OnEvent_I2CWrite(0, dataBuff, 10);
 	if(OnEvent_I2CRead) OnEvent_I2CRead(0, dataBuff, 10);
 	if(OnEvent_I2CError) OnEvent_I2CError(0, 0xaa);
-
-	return OK;
-}
-
-//*****************************************************************************
-UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
-//*****************************************************************************
-// MCU dependant function: I2C config port
-//*****************************************************************************
-{
-	//config port
-	if( I2C_Config_Port(I2C_Config_Handler->PortNumber) == ERROR)
-	{
-		return ERROR;
-	}
-
-	//config CLK
-	if( I2C_Config_Clk(I2C_Config_Handler->busSpeed) == ERROR)
-	{
-		return ERROR;
-	}
-	else
-
-	//config timeout
-	if( I2C_Config_Port(I2C_Config_Handler->I2CTimeout) == ERROR)
-	{
-		return ERROR;
-	}
-
-	//saving current i2c config
-	SaveI2CPhysicalDriverConfig(I2C_Config_Handler);
 
 	return OK;
 }
