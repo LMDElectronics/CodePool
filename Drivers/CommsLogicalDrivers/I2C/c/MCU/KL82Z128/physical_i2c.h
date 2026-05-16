@@ -52,20 +52,15 @@ typedef struct
  */
 typedef enum
 {
-	pinoutLocation_Alt2,		//Alt2 		-> [PTB0, SCL],[PTB1, SDA]
-	pinoutLocation_Alt7,		//Alt 7 	-> [PTD2, SCL],[PTD3, SDA]
+	pinoutLocation_Alt1,
+	pinoutLocation_Alt2,
+	pinoutLocation_Alt3,
+	pinoutLocation_Alt4,
+	pinoutLocation_Alt5,
+	pinoutLocation_Alt6,
+	pinoutLocation_Alt7
 
-}TI2C0PinoutLocation;
-
-/**
- * @ Enums for multiple i2c1 pinout location [section 11.3.1, KL82P121M72SF0RM.pdf]
- */
-typedef enum
-{
-	pinoutLocation_Alt6,	//Alt 6 -> [PTE0, SDA],[PTE1, SCL]
-	pinoutLocation_Alt2		//Alt 2 -> [PTC10, SCL],[PTC11, SDA]
-
-}TI2C1PinoutLocation;
+}TI2CPinoutLocation;
 
 /**
  * @ Enums for physical i2c driver features

@@ -20,7 +20,7 @@ TI2CPeripheralFeatures i2cPhysicalDriverFeatures;
 TI2cPhysicalConfigHandler PhysicalDriverConfigHandler; //config handler for i2c module
 
 //*****************************************************************************
-UINT8 I2C0_Config_PinoutLocation(TI2C0PinoutLocation pinoutLocation)
+UINT8 I2C0_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 //*****************************************************************************
 // MCU dependant function: I2C config pinout location
 //*****************************************************************************
@@ -30,25 +30,36 @@ UINT8 I2C0_Config_PinoutLocation(TI2C0PinoutLocation pinoutLocation)
 	{
 		default:
 		case pinoutLocation_Alt2:
-			//enable clock gate for i2c selected pinout port
+			//enable clock gate for i2c0 selected pinout port
 			SIM->SCGC5 |= 0x00000400;
 
-			//setup the corresponding selected pins for i2c signals
+			//setup the corresponding selected pins for i2c0 signals
 	    /* PORTB0  I2C0_SCL*/
-			PORTB->PCR[0] = 0x00000200;
+			PORTB->PCR[0] |= 0x00000200;
 	    /* PORTB1  I2C0_SDA*/
-			PORTB->PCR[1] = 0x00000200;
-			break;
+			PORTB->PCR[1] |= 0x00000200;
+
+		return OK;
+		break;
 
 		case pinoutLocation_Alt7:
-			//enable clock gate for i2c selected pinout port
-			//setup the corresponding selected pins for i2c signals
-			break;
+			//enable clock gate for i2c0 selected pinout port
+			SIM->SCGC5 |= 0x00001000;
+
+			//setup the corresponding selected pins for i2c0 signals
+	    /* PORTD2  I2C0_SCL*/
+			PORTD->PCR[2] |= 0x00000700;
+	    /* PORTD3  I2C0_SDA*/
+			PORTD->PCR[3] |= 0x00000700;
+
+		return OK;
+		break;
 	}
+	return ERROR;
 }
 
 //*****************************************************************************
-UINT8 I2C1_Config_PinoutLocation(TI2C1PinoutLocation pinoutLocation)
+UINT8 I2C1_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 //*****************************************************************************
 // MCU dependant function: I2C config pinout location
 //*****************************************************************************
@@ -57,19 +68,33 @@ UINT8 I2C1_Config_PinoutLocation(TI2C1PinoutLocation pinoutLocation)
 	switch(pinoutLocation)
 	{
 		default:
-		case pinoutLocation_Alt6:
-			//enable clock gate for i2c1 selected pinout port [section 13.2.8, KL82P121M72SF0RM.pdf]
+		case pinoutLocation_Alt2:
+			//enable clock gate for i2c1 selected pinout port
+			SIM->SCGC5 |= 0x00000800;
+
+			//setup the corresponding selected pins for i2c1 signals
+	    /* PORTC10  I2C1_SCL*/
+			PORTC->PCR[10] |= 0x00000200;
+	    /* PORTC11  I2C1_SDA*/
+			PORTC->PCR[11] |= 0x00000200;
+		return OK;
+		break;
+
+		case pinoutLocation_Alt6 :
+			//enable clock gate for i2c1 selected pinout port
 			SIM->SCGC5 |= 0x00002000;
 
-			//setup the corresponding selected pins for i2c signals
+			//setup the corresponding selected pins for i2c1 signals
+	    /* PORTE0  I2C1_SCL*/
+			PORTE->PCR[0] |= 0x00000600;
+	    /* PORTE1  I2C1_SDA*/
+			PORTE->PCR[1] |= 0x00000600;
 
-			break;
-
-		case pinoutLocation1_Alt2:
-			//enable clock gate for i2c1 selected pinout port
-			//setup the corresponding selected pins for i2c signals
-			break;
+		return OK;
+		break;
 	}
+
+	return ERROR;
 }
 
 //*****************************************************************************
@@ -93,7 +118,7 @@ UINT8 I2C_Config_port(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 
 			//set the pinout location
 			I2C0_Config_PinoutLocation(I2C_Config_Handler->pinoutLocation);
-			break;
+		break;
 
 		case 1:
 			//enable clock gate for i2c port 1 mcu peripheral [section 13.2.7, KL82P121M72SF0RM.pdf]
@@ -110,8 +135,9 @@ UINT8 I2C_Config_port(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 			break;
 
 		default:
-			return ERROR;
-			break;
+			//if port greater than 1 is trying to be confifgured, drivers raise an error
+		return ERROR;
+		break;
 	}
 
 	return OK;
