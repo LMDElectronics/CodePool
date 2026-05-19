@@ -86,6 +86,8 @@ TI2C_Status Logical_I2C_Config(TI2cLogicConfigHandler *I2C_Config_Handler)
 	I2c_Phy_Config_Handler.I2CTimeout = I2C_Config_Handler->I2CTimeout;
 	I2c_Phy_Config_Handler.slave10AddressBitsOn = I2C_Config_Handler->slave10AddressBitsOn;
 	I2c_Phy_Config_Handler.pinoutLocation = I2C_Config_Handler->pinoutLocation;
+	I2c_Phy_Config_Handler.useDMA = I2C_Config_Handler->useDMA;
+	I2c_Phy_Config_Handler.useInterrupts = I2C_Config_Handler->useInterrupts;
 
 	I2c_Phy_Config_Handler.callbackWriteI2c = DoOn_I2C_Physical_Event_Write;
 	I2c_Phy_Config_Handler.callbackReadI2c = DoOn_I2C_Physical_Event_Read;
@@ -233,7 +235,7 @@ void DoOn_I2C_Physical_Event_Error(UINT8 port, UINT8 error)
 {
 	I2CLogicalReturnData data;
 
-	data.dataBuff = NULL;
+	data.dataBuff = 0;
 	data.port = port;
 	data.count = 0;
 	data.error = error;

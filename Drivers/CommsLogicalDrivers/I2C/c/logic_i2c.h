@@ -55,12 +55,14 @@ typedef void (*OnFeaturesRecv)(TI2CMCUFeatures);
  */
 typedef struct
 {
-	UINT8		portNumber;							/**<Physical i2c bus number >*/
-	UINT16	busSpeed;								/**<Physical i2c bus speed >*/
-	UINT8		slave10AddressBitsOn; 	/**<Physical i2c bits used for slave address>*/
-	UINT16	I2CTimeout;							/**<Physical i2c timout to wait for response from slave>*/
-	UINT8		mastermode;							/**<Physical i2c port mode>*/
-	UINT8		pinoutLocation;					/**<Physical i2c location for i2c pinout ios (for mcu supporting multiple peripheral pinouts)> */
+	UINT8		portNumber;							/**<Logic i2c bus number >*/
+	UINT16	busSpeed;								/**<Logic i2c bus speed >*/
+	UINT8		slave10AddressBitsOn; 	/**<Logic i2c bits used for slave address>*/
+	UINT16	I2CTimeout;							/**<Logic i2c timout to wait for response from slave>*/
+	UINT8		mastermode;							/**<Logic i2c port mode>*/
+	UINT8		pinoutLocation;					/**<Logic i2c location for i2c pinout ios (for mcu supporting multiple peripheral pinouts)> */
+	UINT8 	useDMA;									/**<Logic i2c use DMA>*/
+	UINT8 	useInterrupts;					/**<Logic i2c use interrupts>*/
 
 	OnWriteI2C			WriteI2C_Callback;
 	OnReadI2C				ReadI2C_Callback;

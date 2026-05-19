@@ -23,6 +23,27 @@ TI2CMCUFeatures i2cPhysicalDriverFeatures;
 TI2cPhysicalConfigHandler PhysicalDriverConfigHandler; //config handler for i2c module
 
 //*****************************************************************************
+UINT8 I2C_Config_Clock_Gate(UINT8 portNumber)
+//*****************************************************************************
+// Configure the I2c peripheral clock gate
+//*****************************************************************************
+{
+	switch(portNumber)
+	{
+	case 0:
+		SIM->SCGC4 |= 0x00000040;
+		return OK;
+
+	case 1:
+		SIM->SCGC4 |= 0x00000080;
+		return OK;
+
+	default:
+		return ERROR;
+	}
+}
+
+//*****************************************************************************
 UINT8 I2C0_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 //*****************************************************************************
 // MCU dependant function: I2C config pinout location
@@ -43,9 +64,7 @@ UINT8 I2C0_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 			PORTB->PCR[0] |= 0x00000200;
 	    /* PORTB1  I2C0_SDA*/
 			PORTB->PCR[1] |= 0x00000200;
-
 		return OK;
-		break;
 
 		case pinoutLocation_Alt7:
 			//enable clock gate for i2c0 selected pinout port
@@ -56,9 +75,7 @@ UINT8 I2C0_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 			PORTD->PCR[2] |= 0x00000700;
 	    /* PORTD3  I2C0_SDA*/
 			PORTD->PCR[3] |= 0x00000700;
-
-		return OK;
-		break;
+			return OK;
 	}
 	return ERROR;
 }
@@ -82,8 +99,7 @@ UINT8 I2C1_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 			PORTC->PCR[10] |= 0x00000200;
 	    /* PORTC11  I2C1_SDA*/
 			PORTC->PCR[11] |= 0x00000200;
-		return OK;
-		break;
+			return OK;
 
 		case pinoutLocation_Alt6 :
 			//enable clock gate for i2c1 selected pinout port
@@ -94,89 +110,10 @@ UINT8 I2C1_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 			PORTE->PCR[0] |= 0x00000600;
 	    /* PORTE1  I2C1_SDA*/
 			PORTE->PCR[1] |= 0x00000600;
-
-		return OK;
-		break;
+			return OK;
 	}
 
 	return ERROR;
-}
-
-//*****************************************************************************
-UINT8 I2C_Config_port(TI2cPhysicalConfigHandler *I2C_Config_Handler)
-//*****************************************************************************
-// MCU dependant function: I2C config port
-//*****************************************************************************
-{
-	//configuring peripheral i2c
-	switch(I2C_Config_Handler->portNumber)
-	{
-		case 0:
-			//enable clock gate for i2c port 0 mcu peripheral [section 13.2.7, KL82P121M72SF0RM.pdf]
-			SIM->SCGC4 |= 0x00000040;
-
-			//[section 49.3.1, KL82P121M72SF0RM.pdf]
-			I2C0->C1 |= 0b01100000;
-
-			//[section 49.4.6, KL82P121M72SF0RM.pdf]
-			I2C0->C2 |= 0b00000000;
-
-			//set the pinout location
-			I2C0_Config_PinoutLocation(I2C_Config_Handler->pinoutLocation);
-		break;
-
-		case 1:
-			//enable clock gate for i2c port 1 mcu peripheral [section 13.2.7, KL82P121M72SF0RM.pdf]
-			SIM->SCGC4 |= 0x00000080;
-
-			//[section 49.3.1, KL82P121M72SF0RM.pdf]
-			I2C1->C1 |= 0b01100000;
-
-			//[section 49.4.6, KL82P121M72SF0RM.pdf]
-			I2C1->C2 |= 0b00000000;
-
-			//set the pinout location
-			I2C1_Config_PinoutLocation(I2C_Config_Handler->pinoutLocation);
-			break;
-
-		default:
-			//if port greater than 1 is trying to be confifgured, drivers raise an error
-		return ERROR;
-		break;
-	}
-
-	return OK;
-}
-
-//*****************************************************************************
-UINT8 I2C_Config_Clk(TI2cPhysicalConfigHandler *I2C_Config_Handler)
-//*****************************************************************************
-// MCU dependant function: I2C config clk speed
-//*****************************************************************************
-{
-	switch(I2C_Config_Handler->portNumber)
-	{
-		case 0:
-			break;
-
-		case 1:
-			break;
-
-		default:
-			return ERROR;
-			break;
-	}
-	return OK;
-}
-
-//*****************************************************************************
-UINT8 I2C_Config_Timeout(UINT8 timeout)
-//*****************************************************************************
-// MCU dependant function: I2C config clk speed
-//*****************************************************************************
-{
-	//TODO
-	return OK;
 }
 
 //*****************************************************************************
@@ -189,6 +126,8 @@ void SaveI2CPhysicalDriverConfig(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 	PhysicalDriverConfigHandler.busSpeed = I2C_Config_Handler->busSpeed;
 	PhysicalDriverConfigHandler.I2CTimeout = I2C_Config_Handler->I2CTimeout;
 	PhysicalDriverConfigHandler.slave10AddressBitsOn = I2C_Config_Handler->slave10AddressBitsOn;
+	PhysicalDriverConfigHandler.masterModeOn = I2C_Config_Handler->masterModeOn;
+	PhysicalDriverConfigHandler.useDMA = I2C_Config_Handler->useDMA;
 
 	//wiring events to callbacks from logical driver
 	OnEvent_I2CWrite = I2C_Config_Handler->callbackWriteI2c;
@@ -243,27 +182,68 @@ TI2CMCUFeatures *I2C_AskPeripheralFeatures(void)
 //*****************************************************************************
 UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 //*****************************************************************************
-//
+// Config I2C peripheral
 //*****************************************************************************
 {
-	//config port
-	if( I2C_Config_port(I2C_Config_Handler) == ERROR)
+	I2C_Type *port;
+
+	//configuring pinout
+	switch(I2C_Config_Handler->portNumber)
+	{
+		case 0:
+				port = ((I2C_Type *)I2C0_BASE);
+
+				//config pinout location
+				if(I2C0_Config_PinoutLocation(I2C_Config_Handler->pinoutLocation) == ERROR)
+				{
+					return ERROR;
+				}
+				break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+
+			//config pinout location
+			if(I2C1_Config_PinoutLocation(I2C_Config_Handler->pinoutLocation) == ERROR)
+			{
+				return ERROR;
+			}
+			break;
+
+		default:
+			return ERROR;
+	}
+
+	//Config clock gate for peripheral [section 13.2.7, KL82P121M72SF0RM.pdf]
+	if(I2C_Config_Clock_Gate(I2C_Config_Handler->portNumber) == ERROR)
 	{
 		return ERROR;
 	}
 
-	//config CLK
-	if( I2C_Config_Clk(I2C_Config_Handler) == ERROR)
+	//config mode [section 49.3.1, KL82P121M72SF0RM.pdf]
+	if(I2C_Config_Handler->masterModeOn == TRUE)
 	{
-		return ERROR;
+		port->C1 |= 0x20;
 	}
 	else
-
-	//config timeout
-	if( I2C_Config_Timeout(I2C_Config_Handler->I2CTimeout) == ERROR)
 	{
-		return ERROR;
+		port->C1 |= 0xDF;
 	}
+
+	//config interrupts
+	if(I2C_Config_Handler->useInterrupts)
+	{
+		port->C1 |= 0x40;
+	}
+	else
+	{
+		port->C1 &= 0xBF;
+	}
+
+	//config i2c slave address bits	//TODO
+	//config i2c using DMA 					//TODO
+	//config bus speed 							//TODO
+	//config bus timeouts						//TODO
 
 	//saving current i2c config
 	SaveI2CPhysicalDriverConfig(I2C_Config_Handler);

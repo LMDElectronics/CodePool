@@ -3,7 +3,6 @@
 
 #define OK		0
 #define ERROR 1
-#define NULL  0
 
 #define TRUE 	1
 #define FALSE 0

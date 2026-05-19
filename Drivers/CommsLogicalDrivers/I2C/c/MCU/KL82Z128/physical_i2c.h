@@ -41,6 +41,8 @@ typedef struct
 	UINT8		masterModeOn;					/**<Physical i2c master mode or slave mode>*/
 	UINT8		slave10AddressBitsOn;	/**<Physical i2c bits used for slave address>*/
 	UINT16	I2CTimeout;						/**<Physical i2c timout to wait for response from slave>*/
+	UINT8 	useDMA;								/**<Physical i2c use DMA for transfers>*/
+	UINT8		useInterrupts;					/**<Physical i2c has interrupts>*/
 
 	OnWrite	callbackWriteI2c;
 	OnRead 	callbackReadI2c;
