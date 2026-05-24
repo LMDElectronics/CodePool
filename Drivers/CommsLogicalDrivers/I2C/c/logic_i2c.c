@@ -88,6 +88,7 @@ TI2C_Status Logical_I2C_Config(TI2cLogicConfigHandler *I2C_Config_Handler)
 	I2c_Phy_Config_Handler.pinoutLocation = I2C_Config_Handler->pinoutLocation;
 	I2c_Phy_Config_Handler.useDMA = I2C_Config_Handler->useDMA;
 	I2c_Phy_Config_Handler.useInterrupts = I2C_Config_Handler->useInterrupts;
+	I2c_Phy_Config_Handler.masterModeOn = I2C_Config_Handler->mastermode;
 
 	I2c_Phy_Config_Handler.callbackWriteI2c = DoOn_I2C_Physical_Event_Write;
 	I2c_Phy_Config_Handler.callbackReadI2c = DoOn_I2C_Physical_Event_Read;

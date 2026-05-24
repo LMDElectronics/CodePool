@@ -128,6 +128,7 @@ void SaveI2CPhysicalDriverConfig(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 	PhysicalDriverConfigHandler.slave10AddressBitsOn = I2C_Config_Handler->slave10AddressBitsOn;
 	PhysicalDriverConfigHandler.masterModeOn = I2C_Config_Handler->masterModeOn;
 	PhysicalDriverConfigHandler.useDMA = I2C_Config_Handler->useDMA;
+	PhysicalDriverConfigHandler.useInterrupts = I2C_Config_Handler->useInterrupts;
 
 	//wiring events to callbacks from logical driver
 	OnEvent_I2CWrite = I2C_Config_Handler->callbackWriteI2c;
@@ -220,6 +221,7 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 		return ERROR;
 	}
 
+
 	//config mode [section 49.3.1, KL82P121M72SF0RM.pdf]
 	if(I2C_Config_Handler->masterModeOn == TRUE)
 	{
@@ -240,9 +242,30 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 		port->C1 &= 0xBF;
 	}
 
-	//config i2c slave address bits	//TODO
-	//config i2c using DMA 					//TODO
-	//config bus speed 							//TODO
+	//config i2c slave address bits
+	if(I2C_Config_Handler->slave10AddressBitsOn)
+	{
+		port->C2 |= 0x40;
+	}
+	else
+	{
+		port->C2 &= 0xBF;
+	}
+
+	//config i2c using DMA //TODO
+	if(I2C_Config_Handler->useDMA)
+	{
+		port->C1 |= 0x01;
+	}
+	else
+	{
+		port->C1 &= 0xFE;
+	}
+
+	//config bus speed //TODO
+	//I2c uses Bus clock, Max 24Mhz [section 5.7, KL82P121M72SF0RM.pdf]
+	//port->F = 4; //preescaling for 1Mhz
+
 	//config bus timeouts						//TODO
 
 	//saving current i2c config
@@ -254,13 +277,27 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 //*****************************************************************************
 UINT8 I2C_Start(UINT8 i2cPort)
 //*****************************************************************************
-//
+// TODO
 //*****************************************************************************
 {
-	//
+	switch(i2cPort)
+	{
+		case 0:
+			I2C0->C1 |= 0x80;
+			break;
+
+		case 1:
+			I2C1->C1 |= 0x80;
+			break;
+
+		default:
+			return ERROR;
+	}
+
+	return OK;
 
 	//test
-	UINT8 dataBuff[10];
+	/*UINT8 dataBuff[10];
 	UINT8 i=0;
 
 	for(i=0; i<10; i++)
@@ -270,7 +307,7 @@ UINT8 I2C_Start(UINT8 i2cPort)
 
 	if(OnEvent_I2CWrite) OnEvent_I2CWrite(0, dataBuff, 10);
 	if(OnEvent_I2CRead) OnEvent_I2CRead(0, dataBuff, 10);
-	if(OnEvent_I2CError) OnEvent_I2CError(0, 0xaa);
+	if(OnEvent_I2CError) OnEvent_I2CError(0, 0xaa);*/
 
 	return OK;
 }
@@ -288,10 +325,44 @@ UINT8 I2C_SendRestart(UINT8 i2cPort)
 //*****************************************************************************
 UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8 Count)
 //*****************************************************************************
-//
+// TODO
 //*****************************************************************************
 {
+	I2C_Type *port;
+	volatile UINT8 data=0;
+	volatile UINT8 data2=0;
+	volatile UINT8 data3=0;
+	volatile UINT8 data4=0;
+
+	UINT32 i=0;
+
+	switch(i2cPort)
+	{
+		case 0:
+			port = ((I2C_Type *)I2C0_BASE);
+			break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+			break;
+
+		default:
+			return ERROR;
+	}
 	//TODO
+
+	data 	= I2C0->C1;
+	data2 = I2C0->C2;
+	data3 = I2C0->F;
+
+	I2C0->C1 |= 0x10;
+	I2C0->A1 = addr;
+	I2C0->D = 0xAA;
+
+	for(i=0; i<240000; i++); //test wait
+
+	data3 = I2C0->S;
+
 	return OK;
 }
 
