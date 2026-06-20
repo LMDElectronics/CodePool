@@ -134,7 +134,7 @@ TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBu
  * @return TI2C_Status
 v */
 //*****************************************************************************
-TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr,UINT8 *dataBuff, UINT32 count);
+TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr,UINT8 *dataBuff, UINT32 count, TI2COperation StartOperation, TI2COperation EndOperation);
 //*****************************************************************************
 
 #endif

@@ -505,11 +505,14 @@ UINT8 I2C_ReadByteBlocking(UINT8 i2cPort, UINT8 ack)
 
 	//Rx mode
 	port->C1 &= 0xEF;
+
+	//dummy read
 	data = port->D;
+
 	I2C_CheckBusBusy(i2cPort);
 	I2C_ClearInterrupts(i2cPort);
 
-	return data;
+	return port->D;
 }
 
 //*****************************************************************************
@@ -573,37 +576,66 @@ UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI
 }
 
 //*****************************************************************************
-UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
+UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI2COperation StartOperation, TI2COperation EndOperation)
 //*****************************************************************************
 //
 //*****************************************************************************
 {
-	I2C_Type *port = 0;
+	UINT32 i=0;
 
-	switch(i2cPort)
+	//set the i2c start operation for this transfer
+	switch(StartOperation)
 	{
-		case 0:
-			port = ((I2C_Type *)I2C0_BASE);
+		case SendStart:
+			I2C_SendStart(i2cPort);
 			break;
 
-		case 1:
-			port = ((I2C_Type *)I2C1_BASE);
+		case SendStop:
+			I2C_SendStop(i2cPort);
 			break;
 
+		case SendRestart:
+			I2C_SendRestart(i2cPort);
+			break;
+
+		case DoNothing:
 		default:
-			return ERROR;
+			break;
 	}
 
-	//send start condition if master mode is configured
-	if(PhysicalDriverConfigHandler.masterModeOn)
+	//send device address
+	I2C_WriteByteBlocking(i2cPort, addr | 0x01);
+
+	for(i=0; i < Count; i++)
 	{
-		port->C1 |= 0x20;
+		if(i == Count - 1)
+		{
+			dataBuff[i] = I2C_ReadByteBlocking(i2cPort, 1);
+		}
+		else
+		{
+			dataBuff[i] = I2C_ReadByteBlocking(i2cPort, 0);
+		}
 	}
 
-	//send stop condition if master mode is configured
-	if(PhysicalDriverConfigHandler.masterModeOn)
+	//set the i2c end operation for this transfer
+	switch(EndOperation)
 	{
-		port->C1 &= 0xDF;
+		case SendStart:
+			I2C_SendStart(i2cPort);
+			break;
+
+		case SendStop:
+			I2C_SendStop(i2cPort);
+			break;
+
+		case SendRestart:
+			I2C_SendRestart(i2cPort);
+			break;
+
+		case DoNothing:
+		default:
+			break;
 	}
 
 	return OK;
