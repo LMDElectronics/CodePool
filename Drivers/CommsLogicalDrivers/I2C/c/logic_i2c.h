@@ -120,17 +120,19 @@ TI2C_Status Logical_I2C_Restart(UINT8 i2cPort);
  * @return TI2C_Status
  */
 //*****************************************************************************
-TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBuff, UINT32 count);
+TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBuff, UINT32 count, TI2COperation StartOperation, TI2COperation EndOperation);
 //*****************************************************************************
 
 /**
  * @brief write byte
- * @param[in] i2cPort: 		I2C Port number from which read the data
- * @param[in] deviceAddr: I2C device address
- * @param[in] dataBuff:		I2C buffer to store the bytes read
- * @param[in] count:			I2C number of bytes to read
+ * @param[in] i2cPort: 				I2C Port number from which read the data
+ * @param[in] deviceAddr: 		I2C device address
+ * @param[in] dataBuff:				I2C buffer to store the bytes read
+ * @param[in] count:					I2C number of bytes to read
+ * @param[in] StartOperation:	I2C operation to perfom before data transfer in the bus [start, stop, restart, nothing]
+ * @param[in] StartOperation:	I2C operation to perfom after data transfer in the bus [start, stop, restart, nothing]
  * @return TI2C_Status
- */
+v */
 //*****************************************************************************
 TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr,UINT8 *dataBuff, UINT32 count);
 //*****************************************************************************

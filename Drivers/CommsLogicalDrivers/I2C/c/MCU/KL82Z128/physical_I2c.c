@@ -430,13 +430,13 @@ UINT8 I2C_CheckBusBusy(UINT8 i2cPort)
 			return ERROR;
 	}
 
-	if((port->S & 0x80) != 0x80)
+	if((port->S & 0x02) != 0x02)
 	{
 		return BUSY;
 	}
 	else
 	{
-		return NOT_BUSY
+		return NOT_BUSY;
 	}
 }
 
@@ -463,7 +463,7 @@ UINT8 I2C_WriteByteBlocking(UINT8 i2cPort, UINT8 byte)
 	}
 
 	port->D = byte;
-	while(!(port->S & 0x02));
+	while(I2C_CheckBusBusy(i2cPort));
 	I2C_ClearInterrupts(i2cPort);
 
 	return (port->C1 & 0x01); //ACK bit return
@@ -513,24 +513,61 @@ UINT8 I2C_ReadByteBlocking(UINT8 i2cPort, UINT8 ack)
 }
 
 //*****************************************************************************
-UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
+UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI2COperation StartOperation, TI2COperation EndOperation)
 //*****************************************************************************
 // TODO
 //*****************************************************************************
 {
 	UINT32 i=0;
-	//TODO
 
-	I2C_SendStart(i2cPort);
-
-	I2C_WriteByteBlocking(i2cPort, addr);
-
-	for(i=0; i < Count; i++)
+	//set the i2c start operation for this transfer
+	switch(StartOperation)
 	{
-		I2C_WriteByteBlocking(i2cPort, 0xF3);
+		case SendStart:
+			I2C_SendStart(i2cPort);
+			break;
+
+		case SendStop:
+			I2C_SendStop(i2cPort);
+			break;
+
+		case SendRestart:
+			I2C_SendRestart(i2cPort);
+			break;
+
+		case DoNothing:
+		default:
+			break;
 	}
 
-	I2C_SendStop(i2cPort);
+	//send device address
+	I2C_WriteByteBlocking(i2cPort, addr);
+
+	//send data
+	for(i=0; i < Count; i++)
+	{
+		I2C_WriteByteBlocking(i2cPort, dataBuff[i]);
+	}
+
+	//set the i2c end operation for this transfer
+	switch(EndOperation)
+	{
+		case SendStart:
+			I2C_SendStart(i2cPort);
+			break;
+
+		case SendStop:
+			I2C_SendStop(i2cPort);
+			break;
+
+		case SendRestart:
+			I2C_SendRestart(i2cPort);
+			break;
+
+		case DoNothing:
+		default:
+			break;
+	}
 
 	return OK;
 }

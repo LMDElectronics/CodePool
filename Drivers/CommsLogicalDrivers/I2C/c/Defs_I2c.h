@@ -46,4 +46,13 @@ typedef struct
 
 }TI2CMCUFeatures;
 
+typedef enum
+{
+	SendStart,
+	SendStop,
+	SendRestart,
+	DoNothing
+
+}TI2COperation;
+
 #endif
