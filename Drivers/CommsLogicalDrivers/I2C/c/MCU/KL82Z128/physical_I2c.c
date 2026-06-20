@@ -11,6 +11,9 @@
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\MCU\KL82Z128\physical_i2c.h"
 #include "MKL82Z7.h"
 
+#define NOT_BUSY 			0;
+#define BUSY					1;
+
 //I2c physical driver events
 OnWrite 		OnEvent_I2CWrite;
 OnRead 			OnEvent_I2CRead;
@@ -59,22 +62,22 @@ UINT8 I2C0_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 			//enable clock gate for i2c0 selected pinout port
 			SIM->SCGC5 |= 0x00000400;
 
-			//setup the corresponding selected pins for i2c0 signals
+			//setup the corresponding selected pins for i2c0 signals, and ODE for open drain output
 	    /* PORTB0  I2C0_SCL*/
-			PORTB->PCR[0] |= 0x00000200;
+			PORTB->PCR[0] |= 0x00000220;
 	    /* PORTB1  I2C0_SDA*/
-			PORTB->PCR[1] |= 0x00000200;
+			PORTB->PCR[1] |= 0x00000220;
 		return OK;
 
 		case pinoutLocation_Alt7:
 			//enable clock gate for i2c0 selected pinout port
 			SIM->SCGC5 |= 0x00001000;
 
-			//setup the corresponding selected pins for i2c0 signals
+			//setup the corresponding selected pins for i2c0 signals, and ODE for open drain output
 	    /* PORTD2  I2C0_SCL*/
-			PORTD->PCR[2] |= 0x00000700;
+			PORTD->PCR[2] |= 0x00000720;
 	    /* PORTD3  I2C0_SDA*/
-			PORTD->PCR[3] |= 0x00000700;
+			PORTD->PCR[3] |= 0x00000720;
 			return OK;
 	}
 	return ERROR;
@@ -94,22 +97,22 @@ UINT8 I2C1_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 			//enable clock gate for i2c1 selected pinout port
 			SIM->SCGC5 |= 0x00000800;
 
-			//setup the corresponding selected pins for i2c1 signals
+			//setup the corresponding selected pins for i2c1 signals, and ODE for open drain output
 	    /* PORTC10  I2C1_SCL*/
-			PORTC->PCR[10] |= 0x00000200;
+			PORTC->PCR[10] |= 0x00000220;
 	    /* PORTC11  I2C1_SDA*/
-			PORTC->PCR[11] |= 0x00000200;
+			PORTC->PCR[11] |= 0x00000220;
 			return OK;
 
 		case pinoutLocation_Alt6 :
 			//enable clock gate for i2c1 selected pinout port
 			SIM->SCGC5 |= 0x00002000;
 
-			//setup the corresponding selected pins for i2c1 signals
+			//setup the corresponding selected pins for i2c1 signals, and ODE for open drain output
 	    /* PORTE0  I2C1_SCL*/
-			PORTE->PCR[0] |= 0x00000600;
+			PORTE->PCR[0] |= 0x00000620;
 	    /* PORTE1  I2C1_SDA*/
-			PORTE->PCR[1] |= 0x00000600;
+			PORTE->PCR[1] |= 0x00000620;
 			return OK;
 	}
 
@@ -181,12 +184,64 @@ TI2CMCUFeatures *I2C_AskPeripheralFeatures(void)
 }
 
 //*****************************************************************************
+UINT8 I2C_Start(UINT8 i2cPort)
+//*****************************************************************************
+// TODO
+//*****************************************************************************
+{
+	I2C_Type *port;
+
+	switch(i2cPort)
+	{
+		case 0:
+			port = ((I2C_Type *)I2C0_BASE);
+			break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+			break;
+
+		default: return ERROR;
+	}
+
+	port->C1 |= 0x80;
+
+	return OK;
+}
+
+//*****************************************************************************
+UINT8 I2C_Stop(UINT8 i2cPort)
+//*****************************************************************************
+// TODO
+//*****************************************************************************
+{
+	I2C_Type *port = 0;
+
+	switch(i2cPort)
+	{
+		case 0:
+			port = ((I2C_Type *)I2C0_BASE);
+			break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+			break;
+
+		default: return ERROR;
+	}
+
+	port->C1 &= 0x7F;
+
+	return OK;
+}
+
+//*****************************************************************************
 UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 //*****************************************************************************
 // Config I2C peripheral
 //*****************************************************************************
 {
-	I2C_Type *port;
+	I2C_Type *port = 0;
 
 	//configuring pinout
 	switch(I2C_Config_Handler->portNumber)
@@ -221,17 +276,6 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 		return ERROR;
 	}
 
-
-	//config mode [section 49.3.1, KL82P121M72SF0RM.pdf]
-	if(I2C_Config_Handler->masterModeOn == TRUE)
-	{
-		port->C1 |= 0x20;
-	}
-	else
-	{
-		port->C1 |= 0xDF;
-	}
-
 	//config interrupts
 	if(I2C_Config_Handler->useInterrupts)
 	{
@@ -264,7 +308,7 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 
 	//config bus speed //TODO
 	//I2c uses Bus clock, Max 24Mhz [section 5.7, KL82P121M72SF0RM.pdf]
-	//port->F = 4; //preescaling for 1Mhz
+	port->F = 0x4F; //preescaling for 1Mhz
 
 	//config bus timeouts						//TODO
 
@@ -275,39 +319,80 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 }
 
 //*****************************************************************************
-UINT8 I2C_Start(UINT8 i2cPort)
+UINT8 I2C_ClearInterrupts(UINT8 i2cPort)
 //*****************************************************************************
 // TODO
 //*****************************************************************************
 {
+	I2C_Type *port = 0;
+
 	switch(i2cPort)
 	{
 		case 0:
-			I2C0->C1 |= 0x80;
+			port = ((I2C_Type *)I2C0_BASE);
 			break;
 
 		case 1:
-			I2C1->C1 |= 0x80;
+			port = ((I2C_Type *)I2C1_BASE);
 			break;
 
-		default:
-			return ERROR;
+		default: return ERROR;
 	}
+
+	port->S |= 0x02;
 
 	return OK;
+}
 
-	//test
-	/*UINT8 dataBuff[10];
-	UINT8 i=0;
+//*****************************************************************************
+UINT8 I2C_SendStart(UINT8 i2cPort)
+//*****************************************************************************
+// TODO
+//*****************************************************************************
+{
+	I2C_Type *port = 0;
 
-	for(i=0; i<10; i++)
+	switch(i2cPort)
 	{
-		dataBuff[i] = 0xAA;
+		case 0:
+			port = ((I2C_Type *)I2C0_BASE);
+			break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+			break;
+
+		default: return ERROR;
 	}
 
-	if(OnEvent_I2CWrite) OnEvent_I2CWrite(0, dataBuff, 10);
-	if(OnEvent_I2CRead) OnEvent_I2CRead(0, dataBuff, 10);
-	if(OnEvent_I2CError) OnEvent_I2CError(0, 0xaa);*/
+	port->C1 |= 0x30;
+
+	return OK;
+}
+
+//*****************************************************************************
+UINT8 I2C_SendStop(UINT8 i2cPort)
+//*****************************************************************************
+// TODO
+//*****************************************************************************
+{
+	I2C_Type *port = 0;
+
+	switch(i2cPort)
+	{
+		case 0:
+			port = ((I2C_Type *)I2C0_BASE);
+			break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+			break;
+
+		default: return ERROR;
+	}
+
+	port->C1 &= 0xDF;
+	port->C1 &= 0xEF;
 
 	return OK;
 }
@@ -323,18 +408,13 @@ UINT8 I2C_SendRestart(UINT8 i2cPort)
 }
 
 //*****************************************************************************
-UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8 Count)
+UINT8 I2C_CheckBusBusy(UINT8 i2cPort)
 //*****************************************************************************
-// TODO
+// Busy: 			1
+// Not Busy: 	0
 //*****************************************************************************
 {
-	I2C_Type *port;
-	volatile UINT8 data=0;
-	volatile UINT8 data2=0;
-	volatile UINT8 data3=0;
-	volatile UINT8 data4=0;
-
-	UINT32 i=0;
+	I2C_Type *port = 0;
 
 	switch(i2cPort)
 	{
@@ -349,29 +429,145 @@ UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8
 		default:
 			return ERROR;
 	}
+
+	if((port->S & 0x80) != 0x80)
+	{
+		return BUSY;
+	}
+	else
+	{
+		return NOT_BUSY
+	}
+}
+
+//*****************************************************************************
+UINT8 I2C_WriteByteBlocking(UINT8 i2cPort, UINT8 byte)
+//*****************************************************************************
+// returns the ack byte
+//*****************************************************************************
+{
+	I2C_Type *port = 0;
+
+	switch(i2cPort)
+	{
+		case 0:
+			port = ((I2C_Type *)I2C0_BASE);
+			break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+			break;
+
+		default:
+			return ERROR;
+	}
+
+	port->D = byte;
+	while(!(port->S & 0x02));
+	I2C_ClearInterrupts(i2cPort);
+
+	return (port->C1 & 0x01); //ACK bit return
+}
+
+//*****************************************************************************
+UINT8 I2C_ReadByteBlocking(UINT8 i2cPort, UINT8 ack)
+//*****************************************************************************
+// read a bute from i2c slave
+// ack: ack value 0 or 1 to drive into the line when reading from i2c slave
+//*****************************************************************************
+{
+	I2C_Type *port = 0;
+	UINT8 data=0;
+
+	switch(i2cPort)
+	{
+		case 0:
+			port = ((I2C_Type *)I2C0_BASE);
+			break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+			break;
+
+		default:
+			return ERROR;
+	}
+
+	//drives a 0 or 1 as ack
+	if(ack)
+	{
+		port->C1 &= 0xF7;
+	}
+	else
+	{
+		port->C1 |= 0x08;
+	}
+
+	//Rx mode
+	port->C1 &= 0xEF;
+	data = port->D;
+	I2C_CheckBusBusy(i2cPort);
+	I2C_ClearInterrupts(i2cPort);
+
+	return data;
+}
+
+//*****************************************************************************
+UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
+//*****************************************************************************
+// TODO
+//*****************************************************************************
+{
+	UINT32 i=0;
 	//TODO
 
-	data 	= I2C0->C1;
-	data2 = I2C0->C2;
-	data3 = I2C0->F;
+	I2C_SendStart(i2cPort);
 
-	I2C0->C1 |= 0x10;
-	I2C0->A1 = addr;
-	I2C0->D = 0xAA;
+	I2C_WriteByteBlocking(i2cPort, addr);
 
-	for(i=0; i<240000; i++); //test wait
+	for(i=0; i < Count; i++)
+	{
+		I2C_WriteByteBlocking(i2cPort, 0xF3);
+	}
 
-	data3 = I2C0->S;
+	I2C_SendStop(i2cPort);
 
 	return OK;
 }
 
 //*****************************************************************************
-UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 reg, UINT8 *dataBuff, UINT8 Count)
+UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
 //*****************************************************************************
 //
 //*****************************************************************************
 {
-	//TODO
+	I2C_Type *port = 0;
+
+	switch(i2cPort)
+	{
+		case 0:
+			port = ((I2C_Type *)I2C0_BASE);
+			break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+			break;
+
+		default:
+			return ERROR;
+	}
+
+	//send start condition if master mode is configured
+	if(PhysicalDriverConfigHandler.masterModeOn)
+	{
+		port->C1 |= 0x20;
+	}
+
+	//send stop condition if master mode is configured
+	if(PhysicalDriverConfigHandler.masterModeOn)
+	{
+		port->C1 &= 0xDF;
+	}
+
 	return OK;
 }
