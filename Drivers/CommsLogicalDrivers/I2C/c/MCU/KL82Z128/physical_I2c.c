@@ -496,11 +496,11 @@ UINT8 I2C_ReadByteBlocking(UINT8 i2cPort, UINT8 ack)
 	//drives a 0 or 1 as ack
 	if(ack)
 	{
-		port->C1 &= 0xF7;
+		port->C1 &= 0xF7; //ACK
 	}
 	else
 	{
-		port->C1 |= 0x08;
+		port->C1 |= 0x08; //NACK
 	}
 
 	//Rx mode
@@ -610,11 +610,11 @@ UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI2
 	{
 		if(i == Count - 1)
 		{
-			dataBuff[i] = I2C_ReadByteBlocking(i2cPort, 1);
+			dataBuff[i] = I2C_ReadByteBlocking(i2cPort, 0);
 		}
 		else
 		{
-			dataBuff[i] = I2C_ReadByteBlocking(i2cPort, 0);
+			dataBuff[i] = I2C_ReadByteBlocking(i2cPort, 1);
 		}
 	}
 
