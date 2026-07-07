@@ -308,7 +308,7 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 
 	//config bus speed //TODO
 	//I2c uses Bus clock, Max 24Mhz [section 5.7, KL82P121M72SF0RM.pdf]
-	port->F = 0x2F; //preescaling for 1Mhz
+	port->F = 0x4F; //preescaling for 1Mhz
 
 	//config bus timeouts						//TODO
 
@@ -528,15 +528,15 @@ UINT8 I2C_ReadByteBlocking(UINT8 i2cPort, UINT8 ack)
 	}
 
 	//check to set the Rx mode
-	/*if((port->C1 & 0x10) == 0x10)
+	if((port->C1 & 0x10) == 0x10)
 	{
 		port->C1 &= 0xEF;
 
 		//dummy read, as I2C subsystem has been set to rx
 		data = port->D;
-	}*/
+	}
 
-	I2C_CheckBusBusy(i2cPort);
+	while(I2C_CheckBusBusy(i2cPort));
 	I2C_ClearInterrupts(i2cPort);
 
 	data = port->D;
@@ -586,9 +586,6 @@ UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
 
 	//send device address
 	I2C_WriteByteBlocking(i2cPort, addr | 0x01);
-
-	I2C0->C1 &= 0xEF;
-	data = I2C0->D;
 
 	//TODO solo esta haciendo una lectura en el oscope, mirar porque
 	for(i=0; i < Count-1; i++)
