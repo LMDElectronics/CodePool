@@ -141,7 +141,7 @@ TI2C_Status Logical_I2C_Restart(UINT8 i2cPort)
 }
 
 //*****************************************************************************
-TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBuff, UINT32 count, TI2COperation StartOperation, TI2COperation EndOperation)
+TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBuff, UINT32 count)
 //*****************************************************************************
 //
 //*****************************************************************************
@@ -150,7 +150,7 @@ TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBu
 
 	if(i2cPort <= MAX_DEF_PORTS)
 	{
-		opstatus = I2C_WriteData(i2cPort, deviceAddr, dataBuff, count, StartOperation, EndOperation);
+		opstatus = I2C_WriteData(i2cPort, deviceAddr, dataBuff, count);
 
 		switch (opstatus)
 		{
@@ -167,7 +167,7 @@ TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBu
 }
 
 //*****************************************************************************
-TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBuff, UINT32 count, TI2COperation StartOperation, TI2COperation EndOperation)
+TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBuff, UINT32 count)
 //*****************************************************************************
 //
 //*****************************************************************************
@@ -176,7 +176,7 @@ TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBuf
 
 	if(i2cPort <= MAX_DEF_PORTS)
 	{
-		opstatus = I2C_ReadData(i2cPort, deviceAddr, dataBuff, count, StartOperation, EndOperation);
+		opstatus = I2C_ReadData(i2cPort, deviceAddr, dataBuff, count);
 
 		switch (opstatus)
 		{

@@ -186,7 +186,7 @@ TI2CMCUFeatures *I2C_AskPeripheralFeatures(void)
 //*****************************************************************************
 UINT8 I2C_Start(UINT8 i2cPort)
 //*****************************************************************************
-// TODO
+// Start the I2C HW
 //*****************************************************************************
 {
 	I2C_Type *port;
@@ -212,7 +212,7 @@ UINT8 I2C_Start(UINT8 i2cPort)
 //*****************************************************************************
 UINT8 I2C_Stop(UINT8 i2cPort)
 //*****************************************************************************
-// TODO
+// stops the I2C HW
 //*****************************************************************************
 {
 	I2C_Type *port = 0;
@@ -308,7 +308,7 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 
 	//config bus speed //TODO
 	//I2c uses Bus clock, Max 24Mhz [section 5.7, KL82P121M72SF0RM.pdf]
-	port->F = 0x4F; //preescaling for 1Mhz
+	port->F = 0x2F; //preescaling for 1Mhz
 
 	//config bus timeouts						//TODO
 
@@ -365,7 +365,8 @@ UINT8 I2C_SendStart(UINT8 i2cPort)
 		default: return ERROR;
 	}
 
-	port->C1 |= 0x30;
+	//set mst, master mode & send start condition
+	port->C1 |= 0x20;
 
 	return OK;
 }
@@ -391,8 +392,8 @@ UINT8 I2C_SendStop(UINT8 i2cPort)
 		default: return ERROR;
 	}
 
+	//unset mst, slave mode & send stop condition
 	port->C1 &= 0xDF;
-	port->C1 &= 0xEF;
 
 	return OK;
 }
@@ -403,7 +404,23 @@ UINT8 I2C_SendRestart(UINT8 i2cPort)
 //
 //*****************************************************************************
 {
-	//TODO
+	I2C_Type *port = 0;
+
+	switch(i2cPort)
+	{
+		case 0:
+			port = ((I2C_Type *)I2C0_BASE);
+			break;
+
+		case 1:
+			port = ((I2C_Type *)I2C1_BASE);
+			break;
+
+		default: return ERROR;
+	}
+
+	port->C1 |= 0x04;
+
 	return OK;
 }
 
@@ -447,6 +464,7 @@ UINT8 I2C_WriteByteBlocking(UINT8 i2cPort, UINT8 byte)
 //*****************************************************************************
 {
 	I2C_Type *port = 0;
+	UINT8 data=0;
 
 	switch(i2cPort)
 	{
@@ -462,11 +480,17 @@ UINT8 I2C_WriteByteBlocking(UINT8 i2cPort, UINT8 byte)
 			return ERROR;
 	}
 
+	//check to set the Tx mode
+	if((port->C1 & 0x10) == 0x00)
+	{
+		port->C1 |= 0x10;
+	}
+
 	port->D = byte;
 	while(I2C_CheckBusBusy(i2cPort));
 	I2C_ClearInterrupts(i2cPort);
 
-	return (port->C1 & 0x01); //ACK bit return
+	return (port->S & 0x01); //ACK received bit return
 }
 
 //*****************************************************************************
@@ -493,7 +517,7 @@ UINT8 I2C_ReadByteBlocking(UINT8 i2cPort, UINT8 ack)
 			return ERROR;
 	}
 
-	//drives a 0 or 1 as ack
+	//driving a 0 or 1 as ack bit
 	if(ack)
 	{
 		port->C1 &= 0xF7; //ACK
@@ -503,20 +527,25 @@ UINT8 I2C_ReadByteBlocking(UINT8 i2cPort, UINT8 ack)
 		port->C1 |= 0x08; //NACK
 	}
 
-	//Rx mode
-	port->C1 &= 0xEF;
+	//check to set the Rx mode
+	/*if((port->C1 & 0x10) == 0x10)
+	{
+		port->C1 &= 0xEF;
 
-	//dummy read
-	data = port->D;
+		//dummy read, as I2C subsystem has been set to rx
+		data = port->D;
+	}*/
 
 	I2C_CheckBusBusy(i2cPort);
 	I2C_ClearInterrupts(i2cPort);
 
-	return port->D;
+	data = port->D;
+
+	return data;
 }
 
 //*****************************************************************************
-UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI2COperation StartOperation, TI2COperation EndOperation)
+UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
 //*****************************************************************************
 // TODO
 //*****************************************************************************
@@ -524,24 +553,7 @@ UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI
 	UINT32 i=0;
 
 	//set the i2c start operation for this transfer
-	switch(StartOperation)
-	{
-		case SendStart:
-			I2C_SendStart(i2cPort);
-			break;
-
-		case SendStop:
-			I2C_SendStop(i2cPort);
-			break;
-
-		case SendRestart:
-			I2C_SendRestart(i2cPort);
-			break;
-
-		case DoNothing:
-		default:
-			break;
-	}
+  I2C_SendStart(i2cPort);
 
 	//send device address
 	I2C_WriteByteBlocking(i2cPort, addr);
@@ -553,90 +565,45 @@ UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI
 	}
 
 	//set the i2c end operation for this transfer
-	switch(EndOperation)
-	{
-		case SendStart:
-			I2C_SendStart(i2cPort);
-			break;
-
-		case SendStop:
-			I2C_SendStop(i2cPort);
-			break;
-
-		case SendRestart:
-			I2C_SendRestart(i2cPort);
-			break;
-
-		case DoNothing:
-		default:
-			break;
-	}
+	I2C_SendStop(i2cPort);
 
 	return OK;
 }
 
 //*****************************************************************************
-UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI2COperation StartOperation, TI2COperation EndOperation)
+UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
 //*****************************************************************************
 //
 //*****************************************************************************
 {
 	UINT32 i=0;
+	volatile UINT8 data = 0;
+	volatile UINT8 data1 =0;
+	volatile UINT8 data2 =0;
 
 	//set the i2c start operation for this transfer
-	switch(StartOperation)
-	{
-		case SendStart:
-			I2C_SendStart(i2cPort);
-			break;
-
-		case SendStop:
-			I2C_SendStop(i2cPort);
-			break;
-
-		case SendRestart:
-			I2C_SendRestart(i2cPort);
-			break;
-
-		case DoNothing:
-		default:
-			break;
-	}
+	I2C_SendStart(i2cPort);
 
 	//send device address
 	I2C_WriteByteBlocking(i2cPort, addr | 0x01);
 
-	for(i=0; i < Count; i++)
+	I2C0->C1 &= 0xEF;
+	data = I2C0->D;
+
+	//TODO solo esta haciendo una lectura en el oscope, mirar porque
+	for(i=0; i < Count-1; i++)
 	{
-		if(i == Count - 1)
-		{
-			dataBuff[i] = I2C_ReadByteBlocking(i2cPort, 0);
-		}
-		else
-		{
-			dataBuff[i] = I2C_ReadByteBlocking(i2cPort, 1);
-		}
+		//dataBuff[i] = I2C_ReadByteBlocking(i2cPort, 1); //ACK
+		data1 = I2C_ReadByteBlocking(i2cPort, 1); //ACK
 	}
 
-	//set the i2c end operation for this transfer
-	switch(EndOperation)
-	{
-		case SendStart:
-			I2C_SendStart(i2cPort);
-			break;
+	//dataBuff[i-1] = I2C_ReadByteBlocking(i2cPort, 0); //NACK
+	data2 = I2C_ReadByteBlocking(i2cPort, 0); //NACK
 
-		case SendStop:
-			I2C_SendStop(i2cPort);
-			break;
+	dataBuff[0] = data1;
+	dataBuff[1] = data2;
 
-		case SendRestart:
-			I2C_SendRestart(i2cPort);
-			break;
-
-		case DoNothing:
-		default:
-			break;
-	}
+	I2C_SendStop(i2cPort);
 
 	return OK;
 }

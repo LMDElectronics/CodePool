@@ -56,7 +56,7 @@ UINT8 I2C_Start(UINT8 i2cPort);
 UINT8 I2C_Stop(UINT8 i2cPort);
 UINT8 I2C_SendRestart(UINT8 i2cPort);
 
-UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI2COperation StartOperation, TI2COperation EndOperation);
-UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count, TI2COperation StartOperation, TI2COperation EndOperation);
+UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count);
+UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count);
 
 #endif /* PHYSICAL_I2C_H_ */
