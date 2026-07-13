@@ -276,7 +276,7 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 		return ERROR;
 	}
 
-	//config interrupts
+	//config interrupts //TODO
 	if(I2C_Config_Handler->useInterrupts)
 	{
 		port->C1 |= 0x40;
@@ -308,7 +308,8 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 
 	//config bus speed //TODO
 	//I2c uses Bus clock, Max 24Mhz [section 5.7, KL82P121M72SF0RM.pdf]
-	port->F = 0x2F; //preescaling for 1Mhz
+	//port->F = 0x4F; //preescaling for 1Mhz
+	port->F = 0x00; //preescaling for 1Mhz
 
 	//config bus timeouts						//TODO
 
@@ -464,7 +465,6 @@ UINT8 I2C_WriteByteBlocking(UINT8 i2cPort, UINT8 byte)
 //*****************************************************************************
 {
 	I2C_Type *port = 0;
-	UINT8 data=0;
 
 	switch(i2cPort)
 	{
@@ -496,12 +496,12 @@ UINT8 I2C_WriteByteBlocking(UINT8 i2cPort, UINT8 byte)
 //*****************************************************************************
 UINT8 I2C_ReadByteBlocking(UINT8 i2cPort, UINT8 ack)
 //*****************************************************************************
-// read a bute from i2c slave
+// read a byte from i2c slave
 // ack: ack value 0 or 1 to drive into the line when reading from i2c slave
 //*****************************************************************************
 {
 	I2C_Type *port = 0;
-	UINT8 data=0;
+	volatile UINT8 data=0;
 
 	switch(i2cPort)
 	{
@@ -567,6 +567,9 @@ UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
 	//set the i2c end operation for this transfer
 	I2C_SendStop(i2cPort);
 
+	//rising event
+	if(OnEvent_I2CWrite) OnEvent_I2CWrite(i2cPort, dataBuff, Count);
+
 	return OK;
 }
 
@@ -577,9 +580,6 @@ UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
 //*****************************************************************************
 {
 	UINT32 i=0;
-	volatile UINT8 data = 0;
-	volatile UINT8 data1 =0;
-	volatile UINT8 data2 =0;
 
 	//set the i2c start operation for this transfer
 	I2C_SendStart(i2cPort);
@@ -595,6 +595,9 @@ UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
 	dataBuff[Count-1] = I2C_ReadByteBlocking(i2cPort, 0); //NACK
 
 	I2C_SendStop(i2cPort);
+
+	//rising read event
+	if(OnEvent_I2CRead) OnEvent_I2CRead(i2cPort, dataBuff, Count);
 
 	return OK;
 }

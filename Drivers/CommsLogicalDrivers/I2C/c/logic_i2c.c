@@ -157,6 +157,7 @@ TI2C_Status Logical_I2C_WriteData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBu
 			case I2C_LAST_TRANSACTION_OK:							return I2CPortStatus[i2cPort] = I2C_WRITE_OPERATION_OK;	break;
 			case I2C_LAST_TRANSACTION_ERROR_TIMEOUT: 	return I2CPortStatus[i2cPort] = I2C_ERROR_TIMEOUT; 			break;
 			case I2C_LAST_TRANSACTION_ERROR_ACK: 			return I2CPortStatus[i2cPort] = I2C_ERROR_ACK; 					break;
+			case I2C_LAST_TRANSACTION_NACK: 					return I2CPortStatus[i2cPort] = I2C_ERROR_NACK; 				break;
 			default:														 			return I2CPortStatus[i2cPort] = I2C_ERROR_UNKNOWN;			break;
 		}
 	}
@@ -183,6 +184,7 @@ TI2C_Status Logical_I2C_ReadData(UINT8 i2cPort, UINT8 deviceAddr, UINT8 *dataBuf
 			case I2C_LAST_TRANSACTION_OK:							return I2CPortStatus[i2cPort] = I2C_READ_OPERATION_OK;	break;
 			case I2C_LAST_TRANSACTION_ERROR_TIMEOUT: 	return I2CPortStatus[i2cPort] = I2C_ERROR_TIMEOUT; 			break;
 			case I2C_LAST_TRANSACTION_ERROR_ACK: 			return I2CPortStatus[i2cPort] = I2C_ERROR_ACK; 					break;
+			case I2C_LAST_TRANSACTION_NACK:						return I2CPortStatus[i2cPort] = I2C_ERROR_NACK;					break;
 			default:														 			return I2CPortStatus[i2cPort] = I2C_ERROR_UNKNOWN;			break;
 		}
 	}
@@ -225,7 +227,7 @@ void DoOn_I2C_Physical_Event_Read(UINT8 port, UINT8 *dataBuffer, UINT8 count)
 	data.count = count;
 	data.error = 0;
 
-	OnI2cReadData(data);
+	if(OnI2cReadData) OnI2cReadData(data);
 }
 
 //*****************************************************************************
@@ -241,5 +243,5 @@ void DoOn_I2C_Physical_Event_Error(UINT8 port, UINT8 error)
 	data.count = 0;
 	data.error = error;
 
-	OnI2cError(data);
+	if(OnI2cError) OnI2cError(data);
 }
