@@ -81,18 +81,19 @@ TI2C_Status Logical_I2C_Config(TI2cLogicConfigHandler *I2C_Config_Handler)
 	TI2cPhysicalConfigHandler I2c_Phy_Config_Handler;
 
 	//prepare config data for physical driver
-	I2c_Phy_Config_Handler.portNumber = I2C_Config_Handler->portNumber;
-	I2c_Phy_Config_Handler.busSpeed = I2C_Config_Handler->busSpeed;
-	I2c_Phy_Config_Handler.I2CTimeout = I2C_Config_Handler->I2CTimeout;
+	I2c_Phy_Config_Handler.portNumber 					= I2C_Config_Handler->portNumber;
+	I2c_Phy_Config_Handler.i2cBaseClock 				= I2C_Config_Handler->i2cBaseClock;
+	I2c_Phy_Config_Handler.busSpeed 						= I2C_Config_Handler->busSpeed;
+	I2c_Phy_Config_Handler.I2CTimeout 					= I2C_Config_Handler->I2CTimeout;
 	I2c_Phy_Config_Handler.slave10AddressBitsOn = I2C_Config_Handler->slave10AddressBitsOn;
-	I2c_Phy_Config_Handler.pinoutLocation = I2C_Config_Handler->pinoutLocation;
-	I2c_Phy_Config_Handler.useDMA = I2C_Config_Handler->useDMA;
-	I2c_Phy_Config_Handler.useInterrupts = I2C_Config_Handler->useInterrupts;
-	I2c_Phy_Config_Handler.masterModeOn = I2C_Config_Handler->mastermode;
+	I2c_Phy_Config_Handler.pinoutLocation				= I2C_Config_Handler->pinoutLocation;
+	I2c_Phy_Config_Handler.useDMA 							= I2C_Config_Handler->useDMA;
+	I2c_Phy_Config_Handler.useInterrupts 				= I2C_Config_Handler->useInterrupts;
+	I2c_Phy_Config_Handler.masterModeOn 				= I2C_Config_Handler->mastermode;
 
-	I2c_Phy_Config_Handler.callbackWriteI2c = DoOn_I2C_Physical_Event_Write;
-	I2c_Phy_Config_Handler.callbackReadI2c = DoOn_I2C_Physical_Event_Read;
-	I2c_Phy_Config_Handler.callbackErrorI2c = DoOn_I2C_Physical_Event_Error;
+	I2c_Phy_Config_Handler.callbackWriteI2c 	= DoOn_I2C_Physical_Event_Write;
+	I2c_Phy_Config_Handler.callbackReadI2c 		= DoOn_I2C_Physical_Event_Read;
+	I2c_Phy_Config_Handler.callbackErrorI2c 	= DoOn_I2C_Physical_Event_Error;
 
 	//wiring events to callbacks from app layer
 	OnI2cWriteData 	= I2C_Config_Handler->WriteI2C_Callback;

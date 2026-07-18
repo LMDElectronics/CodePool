@@ -37,7 +37,8 @@ typedef struct
 {
 	UINT8 	portNumber;						/**<Physical i2c bus number >*/
 	UINT8		pinoutLocation;				/**<Physical i2c location for i2c pinout ios (for mcu supporting multiple peripheral pinouts)> */
-	UINT16	busSpeed;							/**<Physical i2c bus speed >*/
+	UINT32  i2cBaseClock;					/**<Physical i2c base clock from which i2c will run (Hz)>*/
+	UINT8		busSpeed;							/**<Physical target i2c bus speed>*/
 	UINT8		masterModeOn;					/**<Physical i2c master mode or slave mode>*/
 	UINT8		slave10AddressBitsOn;	/**<Physical i2c bits used for slave address>*/
 	UINT16	I2CTimeout;						/**<Physical i2c timout to wait for response from slave>*/

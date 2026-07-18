@@ -3,47 +3,6 @@
 
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Drivers\CommsLogicalDrivers\I2C\c\Defs_I2c.h"
 
-//max number of i2c independent ports to be controlled
-#define MAX_DEF_PORTS 8
-
-#define I2C_LAST_TRANSACTION_OK 						0
-#define I2C_LAST_TRANSACTION_ERROR_TIMEOUT 	1
-#define I2C_LAST_TRANSACTION_ERROR_ACK 			2
-#define I2C_LAST_TRANSACTION_NACK			 			3
-#define I2C_LAST_TRANSACTION_ERROR_UNKNOWN 	99
-
-typedef enum
-{
-	I2C_PORT_NOT_INITIALIZED,
-	I2C_PORT_INITIALIZED,
-	I2C_PORT_CONFIGURED,
-	I2C_PORT_STOP,
-
-	I2C_ERROR_INIT_OPERATION,
-	I2C_ERROR_CONFIG_OPERATION,
-	I2C_ERROR_STOP_OPERATION,
-	I2C_ERROR_RESTART_OPERATION,
-	I2C_ERROR_WRITE_DATA_OPERATION,
-
-	I2C_WRITE_OPERATION_OK,
-	I2C_READ_OPERATION_OK,
-	I2C_ERROR_TIMEOUT,
-	I2C_ERROR_ACK,
-	I2C_ERROR_NACK,
-	I2C_ERROR_UNKNOWN,
-
-	I2C_UNREACHABLE_BUS
-}TI2C_Status;
-
-typedef struct
-{
-	UINT8 port;
-	UINT8 *dataBuff;
-	UINT8 count;
-	UINT8 error;
-
-}I2CLogicalReturnData;
-
 /**
  * @ I2C Logical Bus events
  */
@@ -58,13 +17,14 @@ typedef void (*OnFeaturesRecv)(TI2CMCUFeatures);
 typedef struct
 {
 	UINT8		portNumber;							/**<Logic i2c bus number >*/
-	UINT16	busSpeed;								/**<Logic i2c bus speed >*/
-	UINT8		slave10AddressBitsOn; 	/**<Logic i2c bits used for slave address>*/
+	UINT32  i2cBaseClock;						/**<clock freq from which the i2c bus is running (Hz)>*/
+	UINT8		busSpeed;								/**<Logic target i2c bus speed to be set>*/
+	UINT8		slave10AddressBitsOn; 	/**<Logic i2c bits used for slave address flag>*/
 	UINT16	I2CTimeout;							/**<Logic i2c timout to wait for response from slave>*/
-	UINT8		mastermode;							/**<Logic i2c port mode>*/
+	UINT8		mastermode;							/**<Logic i2c port mode flag>*/
 	UINT8		pinoutLocation;					/**<Logic i2c location for i2c pinout ios (for mcu supporting multiple peripheral pinouts)> */
-	UINT8 	useDMA;									/**<Logic i2c use DMA>*/
-	UINT8 	useInterrupts;					/**<Logic i2c use interrupts>*/
+	UINT8 	useDMA;									/**<Logic i2c use DMA flag>*/
+	UINT8 	useInterrupts;					/**<Logic i2c use interrupts flag>*/
 
 	OnWriteI2C			WriteI2C_Callback;
 	OnReadI2C				ReadI2C_Callback;

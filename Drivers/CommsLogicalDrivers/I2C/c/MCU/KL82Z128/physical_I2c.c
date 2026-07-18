@@ -25,6 +25,27 @@ UINT8 portsAndPinoutAlt[2][I2C_PINOUT_ALTERNATIVE_POSITIONS];
 TI2CMCUFeatures i2cPhysicalDriverFeatures;
 TI2cPhysicalConfigHandler PhysicalDriverConfigHandler; //config handler for i2c module
 
+/*
+ * Tabla de divisores según el RM del KL82
+ * ICR → divisor
+ */
+const uint16_t ICR_DivisorTable[64] =
+{
+    /*20,    22,    24,    26,    28,    30,    34,    40,
+    44,    48,    56,    68,    80,    88,    104,   128,
+    160,   192,   224,   256,   288,   320,   384,   448,
+    480,   512,   576,   640,   704,   768,   960,   1024,
+    1152,  1280,  1536,  1792,  1920,  2048,  2304,  2560,
+    3072,  3840,  4096,  5120,  6144,  7168,  7680,  8192,
+    9216,  10240, 12288, 15360, 16384, 20480, 24576, 30720,
+    40960, 49152, 61440, 65536, 0,     0,     0,     0*/
+
+		20, 	22, 	24, 	26, 	28, 	30, 	34, 	40, 	28, 	32, 	36, 	40, 	44, 	48, 56, 	68, 	48, 56, 64, 72,
+		80, 	88, 	104, 	128, 	80, 	96, 	112, 	128, 	144, 	160, 	192, 	240,	160, 192, 224, 	256, 	288,
+		320, 	384, 	480, 	320, 	384, 	448, 	512, 	576, 	640, 	768, 	960, 	640, 	768, 896, 1024, 1152,
+		1280, 1536, 1920, 1280, 1536, 1792, 2048, 2304, 2560, 3072, 3840
+};
+
 //*****************************************************************************
 UINT8 I2C_Config_Clock_Gate(UINT8 portNumber)
 //*****************************************************************************
@@ -119,19 +140,83 @@ UINT8 I2C1_Config_PinoutLocation(TI2CPinoutLocation pinoutLocation)
 	return ERROR;
 }
 
+int My_abs(int v)
+{
+  return v * ((v>0) - (v<0));
+}
+
+//*****************************************************************************
+UINT8 i2c_Config_Clock_Speed(I2C_Type *port, UINT32 clock, UINT8 targetBusClock)
+//*****************************************************************************
+// port: i2c port to set
+// clock: i2c main bus clock
+// busSpeed: I2c target clock
+//
+// returns: OK. ERROR.
+//*****************************************************************************
+{
+	UINT32 desiredDiv = 0;
+	UINT8 icr=0;
+	UINT8 i=0;
+	UINT32 diff=0;
+	UINT32 i2cSpeed=0;
+	UINT8 multFactor=0;
+
+	switch(targetBusClock)
+	{
+
+		case I2C_CLK_400_KHZ:
+			i2cSpeed = 400000;
+		break;
+
+		//all to 1Mhz, max clock that the mcu can achieve
+		case I2C_CLK_1_MHZ:
+		case I2C_CLK_3M4_MHZ:
+		case I2C_CLK_5_MHZ:
+			i2cSpeed = 1000000;
+		break;
+
+		default:
+			case I2C_CLK_100_KHZ:	i2cSpeed = 100000;
+		break;
+	}
+
+	desiredDiv = clock / i2cSpeed;
+
+	//TODO, comprobar que valor de icr se ajusta mas al divisor para conseguir la frecuencia deseada
+	diff = 0xffffffff;
+	i=0;
+	for (icr = 0; icr < 64; icr++)
+	{
+		if(My_abs(ICR_DivisorTable[icr] - desiredDiv) <= diff)
+		{
+			diff = My_abs(ICR_DivisorTable[icr] - desiredDiv);
+			i=icr;
+		}
+	}
+
+	if(icr == 0) return ERROR;
+
+	port->F &= 0x00;
+	port->F = 0x0e;
+
+	return OK;
+}
+
 //*****************************************************************************
 void SaveI2CPhysicalDriverConfig(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 //*****************************************************************************
 //
 //*****************************************************************************
 {
-	PhysicalDriverConfigHandler.portNumber = I2C_Config_Handler->portNumber;
-	PhysicalDriverConfigHandler.busSpeed = I2C_Config_Handler->busSpeed;
-	PhysicalDriverConfigHandler.I2CTimeout = I2C_Config_Handler->I2CTimeout;
-	PhysicalDriverConfigHandler.slave10AddressBitsOn = I2C_Config_Handler->slave10AddressBitsOn;
-	PhysicalDriverConfigHandler.masterModeOn = I2C_Config_Handler->masterModeOn;
-	PhysicalDriverConfigHandler.useDMA = I2C_Config_Handler->useDMA;
-	PhysicalDriverConfigHandler.useInterrupts = I2C_Config_Handler->useInterrupts;
+	PhysicalDriverConfigHandler.portNumber 						= I2C_Config_Handler->portNumber;
+	PhysicalDriverConfigHandler.busSpeed 							= I2C_Config_Handler->busSpeed;
+	PhysicalDriverConfigHandler.i2cBaseClock 					= I2C_Config_Handler->i2cBaseClock;
+	PhysicalDriverConfigHandler.I2CTimeout 						= I2C_Config_Handler->I2CTimeout;
+	PhysicalDriverConfigHandler.slave10AddressBitsOn 	= I2C_Config_Handler->slave10AddressBitsOn;
+	PhysicalDriverConfigHandler.masterModeOn 					= I2C_Config_Handler->masterModeOn;
+	PhysicalDriverConfigHandler.useDMA 								= I2C_Config_Handler->useDMA;
+	PhysicalDriverConfigHandler.useInterrupts 				= I2C_Config_Handler->useInterrupts;
 
 	//wiring events to callbacks from logical driver
 	OnEvent_I2CWrite = I2C_Config_Handler->callbackWriteI2c;
@@ -252,7 +337,7 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 				//config pinout location
 				if(I2C0_Config_PinoutLocation(I2C_Config_Handler->pinoutLocation) == ERROR)
 				{
-					return ERROR;
+					return I2C_ERROR_CONFIG_OPERATION;
 				}
 				break;
 
@@ -262,18 +347,18 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 			//config pinout location
 			if(I2C1_Config_PinoutLocation(I2C_Config_Handler->pinoutLocation) == ERROR)
 			{
-				return ERROR;
+				return I2C_ERROR_CONFIG_OPERATION;
 			}
 			break;
 
 		default:
-			return ERROR;
+			return I2C_ERROR_CONFIG_OPERATION;
 	}
 
 	//Config clock gate for peripheral [section 13.2.7, KL82P121M72SF0RM.pdf]
 	if(I2C_Config_Clock_Gate(I2C_Config_Handler->portNumber) == ERROR)
 	{
-		return ERROR;
+		return I2C_ERROR_CONFIG_OPERATION;
 	}
 
 	//config interrupts //TODO
@@ -306,10 +391,15 @@ UINT8 I2C_Config(TI2cPhysicalConfigHandler *I2C_Config_Handler)
 		port->C1 &= 0xFE;
 	}
 
-	//config bus speed //TODO
-	//I2c uses Bus clock, Max 24Mhz [section 5.7, KL82P121M72SF0RM.pdf]
-	//port->F = 0x4F; //preescaling for 1Mhz
-	port->F = 0x00; //preescaling for 1Mhz
+	//config bus speed
+	if(i2c_Config_Clock_Speed(port, I2C_Config_Handler->i2cBaseClock, I2C_Config_Handler->busSpeed))
+	{
+		return OK;
+	}
+	else
+	{
+		return I2C_ERROR_CONFIG_OPERATION;
+	}
 
 	//config bus timeouts						//TODO
 
@@ -550,7 +640,7 @@ UINT8 I2C_WriteData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
 // TODO
 //*****************************************************************************
 {
-	UINT32 i=0;
+	volatile UINT32 i=0;
 
 	//set the i2c start operation for this transfer
   I2C_SendStart(i2cPort);
@@ -579,7 +669,7 @@ UINT8 I2C_ReadData(UINT8 i2cPort, UINT8 addr, UINT8 *dataBuff, UINT32 Count)
 //
 //*****************************************************************************
 {
-	UINT32 i=0;
+	volatile UINT32 i=0;
 
 	//set the i2c start operation for this transfer
 	I2C_SendStart(i2cPort);

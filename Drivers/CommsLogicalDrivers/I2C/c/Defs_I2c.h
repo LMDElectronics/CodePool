@@ -3,6 +3,47 @@
 
 #include "C:\Users\MAX PC\Documents\repositories\CodePool\Common\MCU\typedef.h"
 
+//max number of i2c independent ports to be controlled
+#define MAX_DEF_PORTS 8
+
+#define I2C_LAST_TRANSACTION_OK 						0
+#define I2C_LAST_TRANSACTION_ERROR_TIMEOUT 	1
+#define I2C_LAST_TRANSACTION_ERROR_ACK 			2
+#define I2C_LAST_TRANSACTION_NACK			 			3
+#define I2C_LAST_TRANSACTION_ERROR_UNKNOWN 	99
+
+typedef enum
+{
+	I2C_PORT_NOT_INITIALIZED,
+	I2C_PORT_INITIALIZED,
+	I2C_PORT_CONFIGURED,
+	I2C_PORT_STOP,
+
+	I2C_ERROR_INIT_OPERATION,
+	I2C_ERROR_CONFIG_OPERATION,
+	I2C_ERROR_STOP_OPERATION,
+	I2C_ERROR_RESTART_OPERATION,
+	I2C_ERROR_WRITE_DATA_OPERATION,
+
+	I2C_WRITE_OPERATION_OK,
+	I2C_READ_OPERATION_OK,
+	I2C_ERROR_TIMEOUT,
+	I2C_ERROR_ACK,
+	I2C_ERROR_NACK,
+	I2C_ERROR_UNKNOWN,
+
+	I2C_UNREACHABLE_BUS
+}TI2C_Status;
+
+typedef struct
+{
+	UINT8 port;
+	UINT8 *dataBuff;
+	UINT8 count;
+	UINT8 error;
+
+}I2CLogicalReturnData;
+
 /**
  * @ I2C clock speed selection
  */
@@ -45,14 +86,5 @@ typedef struct
 	UINT8 DMAI2CTransfersfeature;
 
 }TI2CMCUFeatures;
-
-typedef enum
-{
-	SendStart,
-	SendStop,
-	SendRestart,
-	DoNothing
-
-}TI2COperation;
 
 #endif
